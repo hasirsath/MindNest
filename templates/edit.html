@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Journal Entry</title>
+    <style>
+        body { 
+            background: #f7f7f7; 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding-top: 70px !important; 
+        }
+        .container { 
+            max-width: 500px; 
+            margin: 60px auto; 
+            background: #fff; 
+            padding: 40px 30px 30px 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 12px #bbb; 
+        }
+        h2 { 
+            text-align: center; 
+            color: #36a2eb; 
+            margin-bottom: 30px; 
+        }
+        textarea { 
+            width: 100%; 
+            border-radius: 8px; 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            font-size: 1.1em; 
+            resize: vertical; 
+            min-height: 120px; 
+        }
+        button { 
+            width: 100%; 
+            background: #36a2eb; 
+            color: #fff; 
+            border: none; 
+            border-radius: 8px; 
+            padding: 14px; 
+            font-size: 1.1em; 
+            margin-top: 18px; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+        }
+        button:hover { 
+            background: #258ad6; 
+        }
+        .actions { 
+            text-align: center; 
+            margin-top: 30px; 
+        }
+        .actions a { 
+            display: inline-block; 
+            margin: 0 10px; 
+            color: #36a2eb; 
+            text-decoration: none; 
+            font-weight: bold; 
+        }
+        .actions a:hover { 
+            text-decoration: underline; 
+        }
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: linear-gradient(90deg, #36a2eb 60%, #1976d2 100%);
+            box-shadow: 0 4px 16px #b0c4de;
+            z-index: 1000;
+            border-radius: 0 0 16px 16px;
+            margin-bottom: 40px;
+        }
+        .nav-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 24px;
+        }
+        .logo {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ffd600;
+            margin-right: 30px;
+            white-space: nowrap;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: color 0.2s;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        .nav-links a.nav-auth {
+            border-left: 2px solid #fff3;
+            margin-left: 18px;
+            padding-left: 22px;
+        }
+        .nav-links a:hover {
+            color: #ffd600;
+            background: rgba(255,255,255,0.08);
+        }
+        @media (max-width: 700px) {
+            .nav-flex { flex-direction: column; align-items: stretch; padding: 8px 6px; }
+            .nav-links { flex-direction: column; gap: 0; }
+            .nav-links a { margin: 4px 0; width: 100%; text-align: center; border-left: none; padding-left: 12px; }
+            .logo { margin-bottom: 6px; }
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <div class="nav-flex">
+        <span class="logo">🧠 MindNest</span>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/history">History</a>
+            <a href="/export">Export CSV</a>
+            {% if session.get('logged_in') %}
+                <a href="/logout" class="nav-auth">Logout</a>
+            {% else %}
+                <a href="/login" class="nav-auth">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h2>Edit Your Journal Entry</h2>
+    <form method="POST">
+        <textarea name="entry" required>{{ entry.text }}</textarea>
+        <button type="submit">Save Changes &amp; Re-Analyze</button>
+    </form>
+    <div class="actions">
+        <a href="/history">Back to History</a>
+        <a href="/">Back to Journal</a>
+    </div>
+</div>
+</body>
+</html>

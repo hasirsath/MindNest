@@ -1,5 +1,50 @@
-<form method="POST" action="/analyze">
-  <textarea name="entry" rows="6" cols="50" placeholder="How are you feeling today?" required></textarea>
-  <br>
-  <button type="submit">Analyze</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MindNest Journal</title>
+    <link rel="stylesheet" href="/static/index.css">
+</head>
+<body>
+<nav>
+    <div class="nav-flex">
+        <span class="logo">🧠 MindNest</span>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/history">History</a>
+            <a href="/export">Export CSV</a>
+            {% if session.get('logged_in') %}
+                <a href="/logout" class="nav-auth">Logout</a>
+            {% else %}
+                <a href="/login" class="nav-auth">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h2>How are you feeling today?</h2>
+    <form id="journalForm" method="POST" action="/analyze" autocomplete="off">
+        <textarea name="entry" id="entry" placeholder="Write your thoughts here..." required></textarea>
+        <button type="submit">Analyze</button>
+        <div class="warning" id="warning">Please enter something before submitting.</div>
+    </form>
+    <div style="text-align:center; margin-top:22px;">
+        <a href="/history" style="color:#36a2eb; font-weight:bold; text-decoration:none; font-size:1.1em;">View History</a>
+    </div>
+</div>
+<script>
+    const form = document.getElementById('journalForm');
+    const entry = document.getElementById('entry');
+    const warning = document.getElementById('warning');
+    form.addEventListener('submit', function(e) {
+        if (!entry.value.trim()) {
+            warning.style.display = 'block';
+            e.preventDefault();
+        } else {
+            warning.style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mood Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body>
+<nav>
+    <div class="nav-flex">
+        <span class="logo">🧠 MindNest</span>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/history">History</a>
+            <a href="/export">Export CSV</a>
+            {% if session.get('logged_in') %}
+                <a href="/logout" class="nav-auth">Logout</a>
+            {% else %}
+                <a href="/login" class="nav-auth">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h2>Mood & Emotion Dashboard</h2>
+    <canvas id="moodChart" height="100"></canvas>
+    <canvas id="emotionChart" height="100"></canvas>
+    <div class="legend">
+        <b>Mood Mapping:</b> Positive = 1, Neutral = 0, Negative = -1<br>
+        <b>Emotion Mapping:</b> Joy = 2, Surprise = 1, Neutral = 0, Sadness = -1, Anger = -2, Fear = -3, Disgust = -4
+    </div>
+    <a href="/">Back to Journal</a>
+</div>
+<script>
+    const dates = {{ dates|tojson|safe }};
+    const moodsRaw = {{ moods|tojson|safe }};
+    const emotionsRaw = {{ emotions|tojson|safe }};
+
+    // Map moods to numbers
+    const moodMap = { 'positive': 1, 'neutral': 0, 'negative': -1 };
+    const moods = moodsRaw.map(m => moodMap[m.toLowerCase()] ?? 0);
+
+    // Map emotions to numbers
+    const emotionMap = {
+        'joy': 2,
+        'surprise': 1,
+        'neutral': 0,
+        'sadness': -1,
+        'anger': -2,
+        'fear': -3,
+        'disgust': -4
+    };
+    const emotions = emotionsRaw.map(e => emotionMap[e.toLowerCase()] ?? 0);
+
+    // Mood Chart
+    new Chart(document.getElementById('moodChart'), {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Mood',
+                data: moods,
+                borderColor: '#36a2eb',
+                backgroundColor: 'rgba(54,162,235,0.15)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 5,
+                pointBackgroundColor: '#36a2eb',
+            }]
+        },
+        options: {
+            plugins: {
+                title: { display: true, text: 'Mood Over Time', font: { size: 20 } },
+                legend: { display: true, position: 'top' },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Date' }, grid: { display: true } },
+                y: {
+                    title: { display: true, text: 'Mood Value' },
+                    grid: { display: true },
+                    min: -1, max: 1, ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+
+    // Emotion Chart (line chart for trend)
+    new Chart(document.getElementById('emotionChart'), {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Emotion',
+                data: emotions,
+                borderColor: '#ff6384',
+                backgroundColor: 'rgba(255,99,132,0.15)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 5,
+                pointBackgroundColor: '#ff6384',
+            }]
+        },
+        options: {
+            plugins: {
+                title: { display: true, text: 'Emotion Over Time', font: { size: 20 } },
+                legend: { display: true, position: 'top' },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Date' }, grid: { display: true } },
+                y: {
+                    title: { display: true, text: 'Emotion Value' },
+                    grid: { display: true },
+                    min: -4, max: 2, ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

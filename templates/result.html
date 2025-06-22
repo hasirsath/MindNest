@@ -1,5 +1,66 @@
-<h2>Analysis Result</h2>
-<p><strong>Your Entry:</strong> {{ text }}</p>
-<p><strong>Detected Mood:</strong> {{ result.mood }}</p>
-<p><strong>Detected Emotion:</strong> {{ result.emotion }}</p>
-<p><strong>Suggestion:</strong> {{ result.suggestion }}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis Result</title>
+    <link rel="stylesheet" href="/static/result.css">
+</head>
+<body>
+<nav>
+    <div class="nav-flex">
+        <span class="logo">🧠 MindNest</span>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/history">History</a>
+            <a href="/export">Export CSV</a>
+            {% if session.get('logged_in') %}
+                <a href="/logout" class="nav-auth">Logout</a>
+            {% else %}
+                <a href="/login" class="nav-auth">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h2>Analysis Result</h2>
+    <div class="entry">{{ text }}</div>
+    <div>
+        <span class="badge mood-{{ result.mood|lower }}">Mood: {{ result.mood|capitalize }}</span>
+        <span class="badge emotion-{{ result.emotion|lower }}">Emotion: {{ result.emotion|capitalize }}</span>
+    </div>
+    <div class="suggestion"><strong>Suggestion:</strong> {{ result.suggestion }}</div>
+    <div class="actions">
+        <a href="/">Back to Journal</a>
+        <a href="/dashboard">View Dashboard</a>
+        <button onclick="window.print()">Save as PDF</button>
+    </div>
+</div>
+<script>
+    // Confetti for positive mood
+    const mood = "{{ result.mood|lower }}";
+    if (mood === 'positive') {
+        // Simple confetti effect
+        for (let i = 0; i < 80; i++) {
+            const conf = document.createElement('div');
+            conf.style.position = 'fixed';
+            conf.style.left = Math.random() * 100 + 'vw';
+            conf.style.top = '-20px';
+            conf.style.width = conf.style.height = Math.random() * 8 + 4 + 'px';
+            conf.style.background = `hsl(${Math.random()*360},80%,60%)`;
+            conf.style.opacity = 0.7;
+            conf.style.borderRadius = '50%';
+            conf.style.zIndex = 9999;
+            conf.style.transition = 'top 2.5s linear';
+            document.body.appendChild(conf);
+            setTimeout(() => {
+                conf.style.top = '100vh';
+            }, 10);
+            setTimeout(() => {
+                conf.remove();
+            }, 2600);
+        }
+    }
+</script>
+</body>
+</html>
