@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 from flask import Flask, render_template, request, redirect, url_for, session, Response
 from flask_sqlalchemy import SQLAlchemy
+=======
+from flask import Flask, render_template, request
+from extensions import db
+>>>>>>> 58bf98964668537cf3dec225b7a8dcc9b3556fe2
 from datetime import datetime
 from models.nlp_analysis import analyze_text
 from models.db_models import db, JournalEntry
@@ -24,6 +29,7 @@ def home():
 def analyze():
     entry = request.form['entry']
     result = analyze_text(entry)
+
     new_entry = JournalEntry(
         text=entry,
         sentiment=result['mood'],
@@ -33,8 +39,10 @@ def analyze():
 
     db.session.add(new_entry)
     db.session.commit()
+
     return render_template('result.html', result=result, text=entry)
 
+<<<<<<< HEAD
 @app.route('/dashboard')
 def dashboard():
     entries = JournalEntry.query.order_by(JournalEntry.timestamp).all()
@@ -43,11 +51,14 @@ def dashboard():
     emotions = [entry.emotion for entry in entries]
     return render_template('dashboard.html', dates=dates, moods=moods, emotions=emotions)
 
+=======
+>>>>>>> 58bf98964668537cf3dec225b7a8dcc9b3556fe2
 @app.route('/history')
 def history():
     entries = JournalEntry.query.order_by(JournalEntry.timestamp.desc()).all()
     return render_template('history.html', entries=entries)
 
+<<<<<<< HEAD
 @app.route('/delete/<int:entry_id>', methods=['POST'])
 def delete_entry(entry_id):
     entry = JournalEntry.query.get_or_404(entry_id)
@@ -116,6 +127,20 @@ def login_required(f):
 # Protect routes
 app.route = lambda rule, **options: (lambda f: Flask.route(app, rule, **options)(login_required(f)) if rule not in ['/login', '/logout'] else Flask.route(app, rule, **options)(f))
 
+=======
+@app.route('/dashboard')
+def dashboard():
+    entries = JournalEntry.query.all()
+
+    # Count frequency of each emotion
+    from collections import Counter
+    emotion_counts = Counter(entry.emotion for entry in entries)
+
+    labels = list(emotion_counts.keys())
+    values = list(emotion_counts.values())
+
+    return render_template('dashboard.html', labels=labels, values=values)
+>>>>>>> 58bf98964668537cf3dec225b7a8dcc9b3556fe2
 
 if __name__ == '__main__':
     app.run(debug=True)

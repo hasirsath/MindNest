@@ -6,3 +6,9 @@ __pycache__/
 .idea/
 .vscode/
 *.log
+echo env/ >> .gitignore
+env/
+*.pyd
+*.dll
+*.lib
+*.exe
