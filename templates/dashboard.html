@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -121,95 +120,8 @@
         }
     });
 </script>
-=======
-<html>
-<head>
-    <title>Mood Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<style>
-    body {
-        font-family: 'Poppins', sans-serif;
-        text-align: center;
-        background: #f0f4f8;
-        padding: 30px;
-    }
 
-    h2 {
-        color: #333;
-        margin-bottom: 40px;
-    }
 
-    canvas {
-        background: white;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        border-radius: 10px;
-        padding: 20px;
-        max-width: 700px;
-        margin: auto;
-    }
 
-    a {
-        display: inline-block;
-        margin-top: 20px;
-        text-decoration: none;
-        color: #007bff;
-        font-weight: bold;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-</style>
-
-</head>
-<body>
-    <h2>Mood Trends Dashboard</h2>
-    <canvas id="emotionChart" width="400" height="200"></canvas>
-
-    <script>
-    const ctx = document.getElementById('emotionChart').getContext('2d');
-const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-gradient.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
-gradient.addColorStop(1, 'rgba(75, 192, 192, 0.2)');
-
-const emotionChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: {{ labels|tojson }},
-        datasets: [{
-            label: 'Emotion Frequency',
-            data: {{ values|tojson }},
-            backgroundColor: gradient,
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 2,
-            borderRadius: 5
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                labels: {
-                    font: {
-                        size: 14,
-                        weight: 'bold'
-                    }
-                }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    stepSize: 1
-                }
-            }
-        }
-    }
-});
-
-    </script>
->>>>>>> 58bf98964668537cf3dec225b7a8dcc9b3556fe2
 </body>
 </html>

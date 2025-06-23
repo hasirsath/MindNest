@@ -1,14 +1,9 @@
-<<<<<<< HEAD
 from flask import Flask, render_template, request, redirect, url_for, session, Response
-from flask_sqlalchemy import SQLAlchemy
-=======
-from flask import Flask, render_template, request
-from extensions import db
->>>>>>> 58bf98964668537cf3dec225b7a8dcc9b3556fe2
 from datetime import datetime
 from models.nlp_analysis import analyze_text
 from models.db_models import db, JournalEntry
 import csv
+from functools import wraps
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///journal.db'
@@ -21,29 +16,36 @@ db.init_app(app)
 USERNAME = 'user'
 PASSWORD = 'pass123'
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('logged_in'):
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/')
+@login_required
 def home():
     return render_template('index.html')
 
 @app.route('/analyze', methods=['POST'])
+@login_required
 def analyze():
     entry = request.form['entry']
     result = analyze_text(entry)
-
     new_entry = JournalEntry(
         text=entry,
         sentiment=result['mood'],
-        emotion=result.get('emotion', 'N/A'),  # Add emotion later
+        emotion=result.get('emotion', 'N/A'),
         suggestion=result['suggestion']
     )
-
     db.session.add(new_entry)
     db.session.commit()
-
     return render_template('result.html', result=result, text=entry)
 
-<<<<<<< HEAD
 @app.route('/dashboard')
+@login_required
 def dashboard():
     entries = JournalEntry.query.order_by(JournalEntry.timestamp).all()
     dates = [entry.timestamp.strftime('%Y-%m-%d') for entry in entries]
@@ -51,15 +53,14 @@ def dashboard():
     emotions = [entry.emotion for entry in entries]
     return render_template('dashboard.html', dates=dates, moods=moods, emotions=emotions)
 
-=======
->>>>>>> 58bf98964668537cf3dec225b7a8dcc9b3556fe2
 @app.route('/history')
+@login_required
 def history():
     entries = JournalEntry.query.order_by(JournalEntry.timestamp.desc()).all()
     return render_template('history.html', entries=entries)
 
-<<<<<<< HEAD
 @app.route('/delete/<int:entry_id>', methods=['POST'])
+@login_required
 def delete_entry(entry_id):
     entry = JournalEntry.query.get_or_404(entry_id)
     db.session.delete(entry)
@@ -67,12 +68,12 @@ def delete_entry(entry_id):
     return ('', 204)
 
 @app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
+@login_required
 def edit_entry(entry_id):
     entry = JournalEntry.query.get_or_404(entry_id)
     if request.method == 'POST':
         entry.text = request.form['entry']
         # Re-analyze the updated text
-        from models.nlp_analysis import analyze_text
         result = analyze_text(entry.text)
         entry.sentiment = result['mood']
         entry.emotion = result.get('emotion', 'N/A')
@@ -82,6 +83,7 @@ def edit_entry(entry_id):
     return render_template('edit.html', entry=entry)
 
 @app.route('/export')
+@login_required
 def export_csv():
     entries = JournalEntry.query.order_by(JournalEntry.timestamp.desc()).all()
     def generate():
@@ -113,34 +115,6 @@ def login():
 def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
-
-# Decorator to require login
-from functools import wraps
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('logged_in'):
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-# Protect routes
-app.route = lambda rule, **options: (lambda f: Flask.route(app, rule, **options)(login_required(f)) if rule not in ['/login', '/logout'] else Flask.route(app, rule, **options)(f))
-
-=======
-@app.route('/dashboard')
-def dashboard():
-    entries = JournalEntry.query.all()
-
-    # Count frequency of each emotion
-    from collections import Counter
-    emotion_counts = Counter(entry.emotion for entry in entries)
-
-    labels = list(emotion_counts.keys())
-    values = list(emotion_counts.values())
-
-    return render_template('dashboard.html', labels=labels, values=values)
->>>>>>> 58bf98964668537cf3dec225b7a8dcc9b3556fe2
 
 if __name__ == '__main__':
     app.run(debug=True)
