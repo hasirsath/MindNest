@@ -2,148 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-<<<<<<< HEAD
     <title>MindNest Journal</title>
     <link rel="stylesheet" href="/static/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-<nav>
-    <div class="nav-flex">
-        <span class="logo">🧠 MindNest</span>
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/history">History</a>
-            <a href="/export">Export CSV</a>
-            {% if session.get('logged_in') %}
-                <a href="/logout" class="nav-auth">Logout</a>
-            {% else %}
-                <a href="/login" class="nav-auth">Login</a>
-            {% endif %}
+    <nav>
+        <div class="nav-container">
+            <span class="logo">🧠 MindNest</span>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/history">History</a>
+                {% if session.get('logged_in') %}
+                    <a href="/logout">Logout</a>
+                {% else %}
+                    <a href="/login">Login</a>
+                {% endif %}
+            </div>
         </div>
-    </div>
-</nav>
-<div class="container">
-    <h2>How are you feeling today?</h2>
-    <form id="journalForm" method="POST" action="/analyze" autocomplete="off">
-        <textarea name="entry" id="entry" placeholder="Write your thoughts here..." required></textarea>
-        <button type="submit">Analyze</button>
-        <div class="warning" id="warning">Please enter something before submitting.</div>
-    </form>
-    <div style="text-align:center; margin-top:22px;">
-        <a href="/history" style="color:#36a2eb; font-weight:bold; text-decoration:none; font-size:1.1em;">View History</a>
-    </div>
-</div>
-<script>
-    const form = document.getElementById('journalForm');
-    const entry = document.getElementById('entry');
-    const warning = document.getElementById('warning');
-    form.addEventListener('submit', function(e) {
-        if (!entry.value.trim()) {
-            warning.style.display = 'block';
-            e.preventDefault();
-        } else {
-            warning.style.display = 'none';
-        }
-    });
-</script>
-=======
-    <title>MindNest - Your Personal Journal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Raleway:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
-        font-family: 'Raleway', sans-serif;
-        color: #4B3F3F;
-    }
+    </nav>
 
-    .container {
-        max-width: 700px;
-        margin: 60px auto;
-        background-color: rgba(255, 255, 255, 0.95);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        border-radius: 20px;
-        padding: 40px 50px;
-        box-sizing: border-box;
-    }
-
-    h1 {
-        font-family: 'Great Vibes', cursive;
-        font-size: 40px;
-        text-align: center;
-        color: #8B5E3C;
-        margin-bottom: 20px;
-    }
-
-    form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    form textarea {
-        width: 100%;
-        max-width: 100%;
-        height: 200px;
-        border: none;
-        background-color: #fffaf0;
-        border-radius: 10px;
-        padding: 20px;
-        font-size: 18px;
-        font-family: 'Raleway', sans-serif;
-        box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
-        resize: none;
-        box-sizing: border-box;
-    }
-
-    form button {
-        margin-top: 25px;
-        background-color: #8B5E3C;
-        color: white;
-        font-size: 16px;
-        padding: 12px 30px;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    form button:hover {
-        background-color: #6f462c;
-    }
-
-    .links {
-        text-align: center;
-        margin-top: 30px;
-    }
-
-    .links a {
-        margin: 0 10px;
-        text-decoration: none;
-        color: #8B5E3C;
-        font-weight: bold;
-    }
-
-    .links a:hover {
-        text-decoration: underline;
-    }
-</style>
-
-</head>
-<body>
-    <div class="container">
-        <h1>Dear Diary,</h1>
-        <form action="/analyze" method="post">
-            <textarea name="entry" placeholder="Write your thoughts here..." required></textarea><br>
-            <button type="submit">Analyze My Mood</button>
+    <div class="main-card">
+        <h2>How are you feeling today?</h2>
+        <form id="journalForm" method="POST" action="/analyze" autocomplete="off">
+            <textarea name="entry" id="entry" placeholder="Write your thoughts here..." required></textarea>
+            <button type="submit">Submit</button>
+            <div class="warning" id="warning">Please enter some text.</div>
         </form>
-        <div class="links">
-            <a href="/history">View Past Entries</a> |
-            <a href="/dashboard">Mood Dashboard</a>
-        </div>
+        <a class="view-history" href="/history">View History</a>
     </div>
->>>>>>> 58bf98964668537cf3dec225b7a8dcc9b3556fe2
+
+    <script>
+        const form = document.getElementById('journalForm');
+        const entry = document.getElementById('entry');
+        const warning = document.getElementById('warning');
+        form.addEventListener('submit', function (e) {
+            if (!entry.value.trim()) {
+                warning.style.display = 'block';
+                e.preventDefault();
+            } else {
+                warning.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
