@@ -1,201 +1,174 @@
+/* General Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        body { 
-            background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%); 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            margin: 0; 
-            padding-top: 70px !important; 
-        }
-        .container { 
-            max-width: 1000px; 
-            margin: 60px auto; 
-            background: #fff; 
-            padding: 40px 30px 30px 30px; 
-            border-radius: 18px; 
-            box-shadow: 0 4px 24px #b0c4de; 
-        }
-        h2 { 
-            text-align: center; 
-            color: #36a2eb; 
-            margin-bottom: 30px; 
-            letter-spacing: 1px; 
-        }
-        table { 
-            width: 100%; 
-            border-collapse: separate; 
-            border-spacing: 0 10px; 
-            margin-top: 20px; 
-        }
-        th, td { 
-            padding: 14px 10px; 
-            background: #f8fbff; 
-            border-radius: 8px; 
-            text-align: left; 
-        }
-        th { 
-            background: #e3f2fd; 
-            color: #1976d2; 
-            font-weight: 600; 
-            border-bottom: 2px solid #b3e5fc; 
-        }
-        tr { 
-            box-shadow: 0 2px 8px #e3eafc; 
-        }
-        tr:last-child td { 
-            border-bottom: none; 
-        }
-        .badge { 
-            display: inline-block; 
-            padding: 5px 16px; 
-            border-radius: 20px; 
-            color: #fff; 
-            font-weight: bold; 
-            font-size: 1em; 
-            letter-spacing: 0.5px; 
-        }
-        .mood-positive { 
-            background: #43a047; 
-        }
-        .mood-neutral { 
-            background: #ffa726; 
-        }
-        .mood-negative { 
-            background: #e53935; 
-        }
-        .emotion-joy { 
-            background: #ffd600; 
-            color: #333; 
-        }
-        .emotion-sadness { 
-            background: #64b5f6; 
-        }
-        .emotion-anger { 
-            background: #d32f2f; 
-        }
-        .emotion-fear { 
-            background: #8e24aa; 
-        }
-        .emotion-disgust { 
-            background: #388e3c; 
-        }
-        .emotion-surprise { 
-            background: #ffb300; 
-            color: #333; 
-        }
-        .emotion-neutral { 
-            background: #bdbdbd; 
-            color: #333; 
-        }
-        .actions { 
-            text-align: center; 
-        }
-        .actions button, .actions a { 
-            background: #36a2eb; 
-            color: #fff; 
-            border: none; 
-            border-radius: 6px; 
-            padding: 8px 18px; 
-            cursor: pointer; 
-            margin-left: 6px; 
-            font-size: 1em; 
-            text-decoration: none; 
-            transition: background 0.2s; 
-            display: inline-block; 
-        }
-        .actions button:hover, .actions a:hover { 
-            background: #1976d2; 
-        }
-        .actions button.delete { 
-            background: #e53935; 
-        }
-        .actions button.delete:hover { 
-            background: #b71c1c; 
-        }
-        .top-links { 
-            text-align: center; 
-            margin-bottom: 18px; 
-        }
-        .top-links a { 
-            margin: 0 10px; 
-            color: #36a2eb; 
-            text-decoration: none; 
-            font-weight: bold; 
-            font-size: 1.1em; 
-        }
-        .top-links a:hover { 
-            text-decoration: underline; 
-        }
-        .empty-msg { 
-            text-align: center; 
-            color: #888; 
-            font-size: 1.2em; 
-            margin-top: 40px; 
-        }
-        nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            background: linear-gradient(90deg, #36a2eb 60%, #1976d2 100%);
-            box-shadow: 0 4px 16px #b0c4de;
-            z-index: 1000;
-            border-radius: 0 0 16px 16px;
-            margin-bottom: 40px;
-        }
-        .nav-flex {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 12px 24px;
-        }
-        .logo {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #ffd600;
-            margin-right: 30px;
-            white-space: nowrap;
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1em;
-            transition: color 0.2s;
-            padding: 6px 12px;
-            border-radius: 6px;
-        }
-        .nav-links a.nav-auth {
-            border-left: 2px solid #fff3;
-            margin-left: 18px;
-            padding-left: 22px;
-        }
-        .nav-links a:hover {
-            color: #ffd600;
-            background: rgba(255,255,255,0.08);
-        }
-        @media (max-width: 700px) {
-            .nav-flex { 
-                flex-direction: column; 
-                align-items: stretch; 
-                padding: 8px 6px; 
-            }
-            .nav-links { 
-                flex-direction: column; 
-                gap: 0; 
-            }
-            .nav-links a { 
-                margin: 4px 0; 
-                width: 100%; 
-                text-align: center; 
-                border-left: none; 
-                padding-left: 12px; 
-            }
-            .logo { 
-                margin-bottom: 6px; 
-            }
-        }
-    
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to bottom right, #e3f2fd, #fff);
+    padding-top: 100px;
+    color: #333;
+}
+
+/* Navbar */
+nav {
+    background: #fff3cd;
+    padding: 16px 32px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.nav-links a {
+    margin-left: 24px;
+    text-decoration: none;
+    color: #222;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover {
+    color: #000;
+}
+
+/* Page Container */
+.history-container {
+    max-width: 680px;
+    margin: auto;
+    padding: 32px 16px;
+}
+
+.history-container h1 {
+    font-size: 2.2rem;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+/* Entry Cards */
+.entry-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease;
+}
+
+.entry-card:hover {
+    transform: translateY(-4px);
+}
+
+.timestamp {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.text {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    color: #222;
+    line-height: 1.5;
+}
+
+/* Tags */
+.tags {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.tag {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.mood-tag {
+    background: #dbeafe;
+    color: #111;
+}
+
+.emotion-tag {
+    background: #fef3c7;
+    color: #111;
+}
+
+/* Suggestion */
+.suggestion {
+    font-style: italic;
+    color: #555;
+    margin-bottom: 16px;
+}
+
+/* Action Buttons */
+.actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.btn.edit {
+    background: #fff;
+    border: 2px solid #007bff;
+    color: #007bff;
+}
+
+.btn.edit:hover {
+    background: #007bff;
+    color: #fff;
+}
+
+.btn.delete {
+    background: #fff;
+    border: 2px solid #dc3545;
+    color: #dc3545;
+}
+
+.btn.delete:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .nav-links a {
+        margin-left: 16px;
+        font-size: 0.9rem;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+        padding: 6px 14px;
+    }
+}

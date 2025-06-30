@@ -11,7 +11,7 @@ class JournalEntry(db.Model):
     sentiment = db.Column(db.String(50))
     emotion = db.Column(db.String(50))
     suggestion = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f'<JournalEntry {self.id}>'

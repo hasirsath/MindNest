@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>MindNest Journal</title>
     <link rel="stylesheet" href="/static/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 <nav>
@@ -13,6 +14,7 @@
             <a href="/">Home</a>
             <a href="/dashboard">Dashboard</a>
             <a href="/history">History</a>
+            <a href="/export">Export CSV</a>
             {% if session.get('logged_in') %}
                 <a href="/logout" class="nav-auth">Logout</a>
             {% else %}
