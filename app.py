@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 from flask import Flask, render_template, request, redirect, url_for, session, Response
+=======
+from flask import Flask, render_template, request
+from extensions import db
+>>>>>>> github-version
 from datetime import datetime
 from models.nlp_analysis import analyze_text
 from models.db_models import db, JournalEntry
@@ -44,6 +49,7 @@ def analyze():
     db.session.commit()
     return render_template('result.html', result=result, text=entry)
 
+<<<<<<< HEAD
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -53,12 +59,15 @@ def dashboard():
     emotions = [entry.emotion for entry in entries]
     return render_template('dashboard.html', dates=dates, moods=moods, emotions=emotions)
 
+=======
+>>>>>>> github-version
 @app.route('/history')
 @login_required
 def history():
-    entries = JournalEntry.query.order_by(JournalEntry.timestamp.desc()).all()
+    entries = JournalEntry.query.order_by(JournalEntry.date.desc()).all()
     return render_template('history.html', entries=entries)
 
+<<<<<<< HEAD
 @app.route('/delete/<int:entry_id>', methods=['POST'])
 @login_required
 def delete_entry(entry_id):
@@ -115,6 +124,23 @@ def login():
 def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
+=======
+@app.route('/dashboard')
+def dashboard():
+    entries = JournalEntry.query.all()
+
+    # Count frequency of each emotion
+    from collections import Counter
+    emotion_counts = Counter(entry.emotion for entry in entries)
+
+    labels = list(emotion_counts.keys())
+    values = list(emotion_counts.values())
+    dates = [entry.date.strftime('%Y-%m-%d') for entry in entries]
+    moods = [entry.sentiment for entry in entries]
+    emotions = [entry.emotion for entry in entries]
+
+    return render_template('dashboard.html', labels=labels, values=values, dates=dates, moods=moods, emotions=emotions)
+>>>>>>> github-version
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -2,62 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<<<<<<< HEAD
     <title>Journal History</title>
     <link rel="stylesheet" href="/static/history.css">
 </head>
 <body>
 <nav>
-    <div class="nav-flex">
+    <div class="nav-container">
         <span class="logo">🧠 MindNest</span>
         <div class="nav-links">
-            <a href="/">Home</a>
+            <a href="/index">Home</a>
             <a href="/dashboard">Dashboard</a>
             <a href="/history">History</a>
-            <a href="/export">Export CSV</a>
-            {% if session.get('logged_in') %}
-                <a href="/logout" class="nav-auth">Logout</a>
-            {% else %}
-                <a href="/login" class="nav-auth">Login</a>
-            {% endif %}
+            <a href="/login">Login</a>
+            
         </div>
     </div>
 </nav>
-<div class="container">
-    <h2>Journal Entry History</h2>
-    <div class="top-links">
-        <a href="/">New Entry</a>|
-        <a href="/dashboard">Dashboard</a>
+
+<div class="history-container">
+    <h1>History</h1>
+
+    {% for entry in entries %}
+    <div class="entry-card">
+        <div class="timestamp">{{ entry.date.strftime('%B %d, %Y, %I:%M %p') }}</div>
+        <div class="text">{{ entry.text }}</div>
+
+        <div class="tags">
+            <span class="tag mood-tag">😊 Mood: {{ entry.sentiment }}</span>
+            <span class="tag emotion-tag">🌈 Emotion: {{ entry.emotion }}</span>
+        </div>
+
+        {% if entry.suggestion %}
+        <div class="suggestion"><i>{{ entry.suggestion }}</i></div>
+        {% endif %}
+
+        <div class="actions">
+            <form action="/edit/{{ entry.id }}" method="GET">
+                <button type="submit" class="btn edit">Edit</button>
+            </form>
+            <form action="/delete/{{ entry.id }}" method="POST" onsubmit="return confirm('Delete this entry?');">
+                <button type="submit" class="btn delete">Delete</button>
+            </form>
+        </div>
     </div>
-    {% if entries %}
-    <div style="text-align:right; margin-bottom:10px;">
-        <a href="/export" style="background:#43a047;color:#fff;padding:8px 18px;border-radius:6px;text-decoration:none;font-weight:bold;">Export as CSV</a>
-    </div>
-    <table>
-        <tr>
-            <th>Date</th>
-            <th>Entry</th>
-            <th>Mood</th>
-            <th>Emotion</th>
-            <th>Suggestion</th>
-            <th>Action</th>
-        </tr>
-        {% for entry in entries %}
-        <tr id="row-{{ entry.id }}">
-            <td>{{ entry.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-            <td title="{{ entry.text }}">{{ entry.text|truncate(60) }}</td>
-            <td><span class="badge mood-{{ entry.sentiment|lower }}">{{ entry.sentiment|capitalize }}</span></td>
-            <td><span class="badge emotion-{{ entry.emotion|lower }}">{{ entry.emotion|capitalize }}</span></td>
-            <td>{{ entry.suggestion }}</td>
-            <td class="actions">
-                <button class="delete" onclick="deleteEntry('{{ entry.id }}')">Delete</button>
-                <a href="/edit/{{ entry.id }}">Edit</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% else %}
-    <div class="empty-msg">No journal entries yet. Start by adding a new entry!</div>
-    {% endif %}
+    {% endfor %}
 </div>
 <script>
 function deleteEntry(id) {
@@ -71,26 +60,6 @@ function deleteEntry(id) {
     }
 }
 </script>
-    <h1>Your Journal History</h1>
-    <table>
-        <tr>
-            <th>Date</th>
-            <th>Text</th>
-            <th>Mood</th>
-            <th>Emotion</th>
-            <th>Suggestion</th>
-        </tr>
-        {% for entry in entries %}
-        <tr>
-            <td>{{ entry.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-            <td>{{ entry.text }}</td>
-            <td>{{ entry.sentiment }}</td>
-            <td>{{ entry.emotion }}</td>
-            <td>{{ entry.suggestion }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <a href="/">← Back to Journal</a>
->>>>>>> 58bf98964668537cf3dec225b7a8dcc9b3556fe2
+
 </body>
 </html>
