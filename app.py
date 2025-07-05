@@ -46,12 +46,23 @@ def analyze():
     return render_template('result.html', result=result, text=entry)
 
 
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    entries = JournalEntry.query.order_by(JournalEntry.date).all()
+    dates = [entry.date.strftime('%Y-%m-%d') for entry in entries]
+    moods = [entry.sentiment for entry in entries]
+    emotions = [entry.emotion for entry in entries]
+    return render_template('dashboard.html', dates=dates, moods=moods, emotions=emotions)
+
+
 
 @app.route('/history')
 @login_required
 def history():
     entries = JournalEntry.query.order_by(JournalEntry.date.desc()).all()
     return render_template('history.html', entries=entries)
+
 
 @app.route('/delete/<int:entry_id>', methods=['POST'])
 @login_required
@@ -109,6 +120,8 @@ def login():
 def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
+
+
 @app.route('/dashboard')
 def dashboard():
     entries = JournalEntry.query.all()
@@ -124,6 +137,7 @@ def dashboard():
     emotions = [entry.emotion for entry in entries]
 
     return render_template('dashboard.html', labels=labels, values=values, dates=dates, moods=moods, emotions=emotions)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
