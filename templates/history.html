@@ -2,57 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-<<<<<<< HEAD
+
     <title>Journal History</title>
     <link rel="stylesheet" href="/static/history.css">
-    <style>
-@media print {
-    nav, .export-btn, .pdf-btn, .actions, .top-links { display: none !important; }
-    body { background: #fff !important; }
-    .container { box-shadow: none !important; }
-    table { font-size: 1em; }
-}
-.pdf-btn {
-    background: #43a047;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 18px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-left: 10px;
-}
-.pdf-btn:hover {
-    background: #2e7031;
-}
-</style>
 </head>
 <body>
 <nav>
     <div class="nav-container">
         <span class="logo">🧠 MindNest</span>
         <div class="nav-links">
-            <a href="/index">Home</a>
+            <a href="/">Home</a>
             <a href="/dashboard">Dashboard</a>
             <a href="/history">History</a>
-            <a href="/export">Export CSV</a>
-            {% if session.get('logged_in') %}
-                <a href="/logout" class="nav-auth">Logout</a>
-            {% else %}
-                <a href="/login" class="nav-auth">Login</a>
-            {% endif %}
+            <a href="/login">Login</a>
+            
         </div>
     </div>
 </nav>
-<div class="container">
-    <h2>Journal Entry History</h2>
-    <div class="top-links">
-        <a href="/">New Entry</a>|
-        <a href="/dashboard">Dashboard</a>
-    </div>
-    {% if entries %}
-    <div style="text-align:right; margin-bottom:10px;">
-        <a href="/export" style="background:#43a047;color:#fff;padding:8px 18px;border-radius:6px;text-decoration:none;font-weight:bold;">Export as CSV</a>
+
+<div class="history-container">
+    <h1>History</h1>
+
+    {% for entry in entries %}
+    <div class="entry-card">
+        <div class="timestamp">{{ entry.date.strftime('%B %d, %Y, %I:%M %p') }}</div>
+        <div class="text">{{ entry.text }}</div>
+
+        <div class="tags">
+            <span class="tag mood-tag">😊 Mood: {{ entry.sentiment }}</span>
+            <span class="tag emotion-tag">🌈 Emotion: {{ entry.emotion }}</span>
+        </div>
+
+        {% if entry.suggestion %}
+        <div class="suggestion"><i>{{ entry.suggestion }}</i></div>
+        {% endif %}
+
+        <div class="actions">
+            <form action="/edit/{{ entry.id }}" method="GET">
+                <button type="submit" class="btn edit">Edit</button>
+            </form>
+            <form action="/delete/{{ entry.id }}" method="POST" onsubmit="return confirm('Delete this entry?');">
+                <button type="submit" class="btn delete">Delete</button>
+            </form>
+        </div>
     </div>
     {% endfor %}
 </div>
@@ -68,26 +60,6 @@ function deleteEntry(id) {
     }
 }
 </script>
-    <h1>Your Journal History</h1>
-    <table>
-        <tr>
-            <th>Date</th>
-            <th>Text</th>
-            <th>Mood</th>
-            <th>Emotion</th>
-            <th>Suggestion</th>
-        </tr>
-        {% for entry in entries %}
-        <tr>
-            <td>{{ entry.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-            <td>{{ entry.text }}</td>
-            <td>{{ entry.sentiment }}</td>
-            <td>{{ entry.emotion }}</td>
-            <td>{{ entry.suggestion }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <a href="/">← Back to Journal</a>
->>>>>>> 58bf98964668537cf3dec225b7a8dcc9b3556fe2
+
 </body>
 </html>

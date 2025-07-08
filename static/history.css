@@ -30,11 +30,7 @@ nav {
     margin: auto;
 }
 
-.logo {
-    font-weight: bold;
-    font-size: 1.4rem;
-    color: #333;
-}
+/* logo */
 
 .nav-links a {
     margin-left: 24px;
@@ -171,4 +167,10 @@ nav {
         font-size: 0.9rem;
         padding: 6px 14px;
     }
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.4rem;
+    color: #333;
 }

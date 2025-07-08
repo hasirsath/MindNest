@@ -45,18 +45,6 @@ def analyze():
     db.session.commit()
     return render_template('result.html', result=result, text=entry)
 
-
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    entries = JournalEntry.query.order_by(JournalEntry.date).all()
-    dates = [entry.date.strftime('%Y-%m-%d') for entry in entries]
-    moods = [entry.sentiment for entry in entries]
-    emotions = [entry.emotion for entry in entries]
-    return render_template('dashboard.html', dates=dates, moods=moods, emotions=emotions)
-
-
-
 @app.route('/history')
 @login_required
 def history():
@@ -87,23 +75,6 @@ def edit_entry(entry_id):
         return render_template('result.html', result=result, text=entry.text)
     return render_template('edit.html', entry=entry)
 
-@app.route('/export')
-@login_required
-def export_csv():
-    entries = JournalEntry.query.order_by(JournalEntry.timestamp.desc()).all()
-    def generate():
-        data = [['Date', 'Entry', 'Mood', 'Emotion', 'Suggestion']]
-        for e in entries:
-            data.append([
-                e.timestamp.strftime('%Y-%m-%d %H:%M'),
-                e.text,
-                e.sentiment,
-                e.emotion,
-                e.suggestion
-            ])
-        for row in data:
-            yield ','.join('"' + str(item).replace('"', '""') + '"' for item in row) + '\n'
-    return Response(generate(), mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=journal_entries.csv"})
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -138,6 +109,7 @@ def dashboard():
 
     return render_template('dashboard.html', labels=labels, values=values, dates=dates, moods=moods, emotions=emotions)
 
-
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

@@ -7,31 +7,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-<nav>
-    <div class="nav-flex">
-        <span class="logo">🧠 MindNest</span>
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/history">History</a>
-            <a href="/export">Export CSV</a>
-            {% if session.get('logged_in') %}
-                <a href="/logout" class="nav-auth">Logout</a>
-            {% else %}
-                <a href="/login" class="nav-auth">Login</a>
-            {% endif %}
+    <nav>
+        <div class="nav-container">
+            <span class="logo">🧠 MindNest</span>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/history">History</a>
+                {% if session.get('logged_in') %}
+                    <a href="/logout">Logout</a>
+                {% else %}
+                    <a href="/login">Login</a>
+                {% endif %}
+            </div>
         </div>
-    </div>
-</nav>
-<div class="container">
-    <h2>How are you feeling today?</h2>
-    <form id="journalForm" method="POST" action="/analyze" autocomplete="off">
-        <textarea name="entry" id="entry" placeholder="Write your thoughts here..." required></textarea>
-        <button type="submit">Analyze</button>
-        <div class="warning" id="warning">Please enter something before submitting.</div>
-    </form>
-    <div style="text-align:center; margin-top:22px;">
-        <a href="/history" style="color:#36a2eb; font-weight:bold; text-decoration:none; font-size:1.1em;">View History</a>
+    </nav>
+
+    <div class="main-card">
+        <h2>How are you feeling today?</h2>
+        <form id="journalForm" method="POST" action="/analyze" autocomplete="off">
+            <textarea name="entry" id="entry" placeholder="Write your thoughts here..." required></textarea>
+            <button type="submit">Submit</button>
+            <div class="warning" id="warning">Please enter some text.</div>
+        </form>
+        <a class="view-history" href="/history">View History</a>
     </div>
 </div>
 <script>
