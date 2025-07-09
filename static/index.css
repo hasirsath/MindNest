@@ -118,3 +118,45 @@ button:hover {
 .view-history:hover {
     text-decoration: underline;
 }
+
+/* Voice css */
+
+.mic-container {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+.mic-button {
+  font-size: 1.4rem;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  position: relative;
+  z-index: 2;
+}
+
+.mic-button:focus {
+  outline: none;
+}
+
+.mic-button.active {
+  animation: pulse 1s infinite;
+  background: #eaf4ff;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+  }
+}
