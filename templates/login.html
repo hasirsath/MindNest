@@ -14,10 +14,11 @@
     <h2>Login</h2>
 
     <form method="POST" class="login-form">
-      <button type="button" class="google-btn">
-        <img src="https://img.icons8.com/color/16/000000/google-logo.png" />
+      <a href="{{ url_for('google_login') }}" class="google-btn" style="text-decoration: none;">
+       <img src="https://img.icons8.com/color/16/000000/google-logo.png" />
         Sign in with Google
-      </button>
+      </a>
+
 
       <div class="divider">
         <hr /><span class="divider-text">or</span><hr />

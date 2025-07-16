@@ -12,3 +12,4 @@ env/
 *.dll
 *.lib
 *.exe
+client_secret.json 
