@@ -10,8 +10,11 @@
 - 📊 **Dashboard Visualization** – View mood/emotion trends over time with interactive charts.
 - 📜 **Mood History** – Browse past journal entries by date.
 - 📁 **Export Data** – Download journal data as a CSV file.
-- 🔒 **Login Support (Optional)** – Basic session handling for logged-in/logged-out view.
+- 🔒 **Login Support** – Basic session handling for logged-in/logged-out view.
 - 🎨 **Aesthetic & Gender-Neutral UI** – Clean and mindful design with focus on accessibility.
+- 🗣️ **Voice Input Support** – Easily record and transcribe your thoughts for journaling.
+- 📹 **Video Input Analysis** – Analyze facial expressions and vocal tone from video entries to gain deeper insights into your emotional state.
+- 💡 **Personalized Suggestions** – Receive tailored recommendations, including links to breathing exercises, motivational talks, soothing music, guided meditations, and           more,based on your emotional patterns.
 
 ---
 
