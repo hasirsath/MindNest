@@ -14,10 +14,21 @@
     <h2>Login</h2>
 
     <form method="POST" class="login-form">
-      <a href="{{ url_for('google_login') }}" class="google-btn" style="text-decoration: none;">
-       <img src="https://img.icons8.com/color/16/000000/google-logo.png" />
-        Sign in with Google
-      </a>
+     <h3>Sign in with Google</h3>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<div id="g_id_onload"
+     data-client_id="164236319937-il3g20o3jr5bkekvduum1lulfvm81384.apps.googleusercontent.com"
+     data-callback="handleCredentialResponse"
+     data-context="signin">
+</div>
+
+<div class="g_id_signin"
+     data-type="standard"
+     data-theme="outline"
+     data-size="large">
+</div>
 
 
       <div class="divider">
@@ -40,5 +51,30 @@
       <a href="/signup">Sign up</a>
     </p>
   </div>
+
+  <script>
+    function handleCredentialResponse(response) {
+      // The 'response.credential' is the user's ID token (a JWT)
+      console.log("ID Token received from Google: " + response.credential);
+
+      // Send this token to your Flask backend for verification
+      fetch('/verify-google-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: response.credential }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // Redirect to the home page on successful login
+          window.location.href = '/';
+        } else {
+          alert('Login Failed: ' + data.message);
+        }
+      });
+    }
+</script>
 </body>
 </html>

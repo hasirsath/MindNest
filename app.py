@@ -1,37 +1,35 @@
+# ---------------------- Imports ----------------------
+import os
+from functools import wraps
+from collections import Counter
+
 from flask import Flask, render_template, request, redirect, url_for, session
+from dotenv import load_dotenv
+
+# Google Sign-In verification
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+
+# Local project imports
 from extensions import db
-from datetime import datetime
 from models.nlp_analysis import analyze_text
 from models.db_models import JournalEntry
-from functools import wraps
-from google_auth_oauthlib.flow import Flow
-from dotenv import load_dotenv
-import os
-import pathlib
-import requests
-from collections import Counter
-import certifi
 
+# ---------------------- Configuration ----------------------
 
-
-# Load environment variables
+# Load environment variables from .env file
 load_dotenv()
-
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # Only for local testing
 
 # Flask app setup
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev_secret_key")  # Use .env variable in production
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///journal.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Set a secret key for session management
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+
+# Initialize the database with the Flask app
 db.init_app(app)
-
-
-
-# File path to client_secret.json
-client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
 
 # Simple local login (for testing fallback)
 USERNAME = 'user'
@@ -40,6 +38,9 @@ PASSWORD = 'pass123'
 # ---------------------- Utility ----------------------
 
 def login_required(f):
+    """
+    Decorator to ensure a user is logged in before accessing a route.
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('logged_in'):
@@ -47,9 +48,10 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# ---------------------- Routes ----------------------
+# ---------------------- Core Routes ----------------------
 
 @app.route('/')
+@app.route('/home')
 @login_required
 def home():
     user = {
@@ -61,76 +63,61 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # This now serves as a fallback login and the page with the Google Sign-In button
     error = None
     if request.method == 'POST':
         if request.form['username'] == USERNAME and request.form['password'] == PASSWORD:
             session['logged_in'] = True
+            session['user_name'] = 'Local User'
             return redirect(url_for('home'))
         error = 'Invalid username or password.'
-    return render_template('login.html', error=error)
+    
+    # Pass the Google Client ID to the login template
+    google_client_id = os.getenv("GOOGLE_CLIENT_ID")
+    return render_template('login.html', error=error, google_client_id=google_client_id)
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# ---------------------- Google OAuth ----------------------
+# ---------------------- New Google Sign-In Route ----------------------
 
-@app.route('/google-login')
-def google_login():
-    flow = Flow.from_client_secrets_file(
-        client_secrets_file,
-        scopes=["openid", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"],
-        redirect_uri="http://localhost:5000/callback"
-    )
-    authorization_url, state = flow.authorization_url()
-    session["state"] = state
-    return redirect(authorization_url)
+@app.route('/verify-google-token', methods=['POST'])
+def verify_google_token():
+    """
+    Receives the ID token from the client-side, verifies it with Google,
+    and creates a user session.
+    """
+    try:
+        token = request.json['token']
+        google_client_id = os.getenv("GOOGLE_CLIENT_ID")
 
-@app.route('/callback')
-def callback():
-    state = session.get("state")
-    request_state = request.args.get("state")
+        # Verify the token against Google's public keys
+        id_info = id_token.verify_oauth2_token(
+            token, 
+            google_requests.Request(), 
+            google_client_id
+        )
 
-    if not state or state != request_state:
-        return "State mismatch. Possible CSRF attack.", 400
+        # Token is valid, create a session for the user
+        session.clear()
+        session['logged_in'] = True
+        session['user_id'] = id_info.get('sub') # Google's unique user ID
+        session['user_name'] = id_info.get('name')
+        session['user_email'] = id_info.get('email')
+        session['user_picture'] = id_info.get('picture')
 
-    flow = Flow.from_client_secrets_file(
-        client_secrets_file,
-        scopes=["openid", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"],
-        redirect_uri="http://localhost:5000/callback"
-    )
+        return {"success": True}
 
-    flow.fetch_token(authorization_response=request.url,
-                     verify=certifi.where())
+    except ValueError as e:
+        # Invalid token
+        return {"success": False, "message": f"Invalid token: {e}"}, 401
+    except Exception as e:
+        # Other errors
+        return {"success": False, "message": f"An unexpected error occurred: {e}"}, 500
 
-    credentials = flow.credentials
-    session["credentials"] = {
-        'token': credentials.token,
-        'refresh_token': credentials.refresh_token,
-        'token_uri': credentials.token_uri,
-        'client_id': credentials.client_id,
-        'client_secret': credentials.client_secret,
-        'scopes': credentials.scopes
-    }
-
-    # Get user info
-    userinfo_response = requests.get(
-        "https://www.googleapis.com/oauth2/v1/userinfo",
-        headers={"Authorization": f"Bearer {credentials.token}"}
-    )
-    if userinfo_response.status_code != 200:
-        return "Failed to fetch user info.", 500
-
-    user_info = userinfo_response.json()
-    session['logged_in'] = True
-    session['user_name'] = user_info.get('name')
-    session['user_email'] = user_info.get('email')
-    session['user_picture'] = user_info.get('picture')
-
-    return redirect(url_for('home'))
-
-# ---------------------- Journal Features ----------------------
+# ---------------------- Journal Feature Routes ----------------------
 
 @app.route('/analyze', methods=['POST'])
 @login_required
@@ -192,4 +179,4 @@ def dashboard():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True, use_reloader=False)  # use_reloader=False avoids socket error on Windows
+    app.run(debug=True)

@@ -13,8 +13,11 @@
         <div class="nav-links">
             <a href="/">Home</a>
             <a href="/dashboard">Dashboard</a>
-            <a href="/history">History</a>
-            <a href="/login">Login</a>
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('logout') }}" class="nav-auth">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-auth">Login</a>
+            {% endif %}
             
         </div>
     </div>
