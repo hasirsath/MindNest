@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit Journal Entry</title>
-     <link rel="stylesheet" href="/static/edit.css">
+    <link rel="stylesheet" href="/static/edit.css">
 </head>
 <body>
 <nav>
@@ -13,7 +13,6 @@
             <a href="/">Home</a>
             <a href="/dashboard">Dashboard</a>
             <a href="/history">History</a>
-            <a href="/export">Export CSV</a>
             {% if session.get('logged_in') %}
                 <a href="/logout" class="nav-auth">Logout</a>
             {% else %}
@@ -22,16 +21,16 @@
         </div>
     </div>
 </nav>
+
 <div class="container">
-    <h2>Edit Your Journal Entry</h2>
+    <h2>Edit Entry</h2>
     <form method="POST">
         <textarea name="entry" required>{{ entry.text }}</textarea>
-        <button type="submit">Save Changes &amp; Re-Analyze</button>
+        <div class="btn-group">
+            <button type="submit" class="save-btn">Save changes</button>
+            <button type="submit" formaction="/analyze" class="reanalyze-btn">Reanalyze</button>
+        </div>
     </form>
-    <div class="actions">
-        <a href="/history">Back to History</a>
-        <a href="/">Back to Journal</a>
-    </div>
 </div>
 </body>
 </html>
