@@ -9,5 +9,6 @@ class JournalEntry(db.Model):
     suggestion = db.Column(db.Text)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
+
     def __repr__(self):
         return f'<JournalEntry {self.id}>'

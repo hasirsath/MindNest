@@ -36,7 +36,7 @@
 
   <div class="badges">
     <span class="badge mood-{{ result.mood|lower }}">😊 Mood: {{ result.mood|capitalize }}</span>
-    <span class="badge emotion-{{ result.emotion|lower }}">🌈 Emotion: {{ result.emotion|capitalize }}</span>
+    <span class="badge emotion-{{ result.emotion|lower }}">🌈 Emotion: {{ result.sentiment|capitalize }}</span>
   </div>
 
   <div class="suggestion"><strong>Suggestion:</strong> {{ result.suggestion }}</div>
@@ -50,7 +50,7 @@
 
 <script>
   const mood = "{{ result.mood|lower }}";
-    const emotion = "{{ result.emotion|lower }}";
+    const emotion = "{{ result.sentiment|lower }}";
 </script>
 
 </body>

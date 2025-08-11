@@ -4,14 +4,13 @@ const languageSelect = document.getElementById('language');
 const journalForm = document.getElementById('journalForm');
 
 let isRecording = false;
+let micStream = null;
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
 
 recognition.continuous = true;
-recognition.interimResults = true;
-
-let micStream; // for optional use with audio context
+recognition.interimResults = false;
 
 micBtn.addEventListener('click', () => {
   if (isRecording) {
@@ -19,11 +18,9 @@ micBtn.addEventListener('click', () => {
     micBtn.classList.remove('active');
     isRecording = false;
     if (micStream) {
-      const tracks = micStream.getTracks();
-      tracks.forEach(track => track.stop()); // Stop mic after use
+      micStream.getTracks().forEach(track => track.stop());
     }
   } else {
-    // Step 1: Enable noise suppression before starting recognition
     navigator.mediaDevices.getUserMedia({
       audio: {
         noiseSuppression: true,
@@ -31,45 +28,59 @@ micBtn.addEventListener('click', () => {
         autoGainControl: true
       }
     }).then((stream) => {
-      micStream = stream; // Save the stream for later cleanup
-
-      // Optional: connect stream to audio context (for debug/monitoring)
-      // const audioContext = new AudioContext();
-      // const source = audioContext.createMediaStreamSource(stream);
-      // source.connect(audioContext.destination);
-
-      // Step 2: Start recognition
+      micStream = stream;
       recognition.lang = languageSelect?.value || 'en-IN';
       recognition.start();
       micBtn.classList.add('active');
       isRecording = true;
     }).catch((err) => {
-      alert('Microphone access denied or not available: ' + err.message);
+      alert('Microphone access denied: ' + err.message);
       console.error(err);
     });
   }
 });
 
+// Combine all results properly
 recognition.onresult = (event) => {
-  const transcript = event.results[0][0].transcript.trim();
-  if (transcript) {
-    entry.value += (entry.value ? ' ' : '') + transcript;
+  let finalTranscript = '';
+  for (let i = event.resultIndex; i < event.results.length; ++i) {
+    if (event.results[i].isFinal) {
+      finalTranscript += event.results[i][0].transcript.trim() + ' ';
+    }
+  }
+  if (finalTranscript) {
+    entry.value += (entry.value ? ' ' : '') + finalTranscript.trim();
   }
 };
 
 recognition.onerror = (event) => {
   console.error('Speech recognition error:', event.error);
-  alert('Voice input error: ' + event.error);
   micBtn.classList.remove('active');
   isRecording = false;
+  if (micStream) {
+    micStream.getTracks().forEach(track => track.stop());
+  }
+
+  if (event.error === 'no-speech' || event.error === 'aborted') {
+    // Optionally restart if it was a minor error
+    if (isRecording) {
+      recognition.start();
+    }
+  } else {
+    alert('Voice input error: ' + event.error);
+  }
 };
 
 recognition.onend = () => {
-  micBtn.classList.remove('active');
-  isRecording = false;
+  if (isRecording) {
+    // Auto-restart unless manually stopped
+    recognition.start();
+  } else {
+    micBtn.classList.remove('active');
+  }
 };
 
-// Prevent form submission if both voice and text are empty
+// Prevent empty form submission
 journalForm.addEventListener('submit', (e) => {
   if (!entry.value.trim()) {
     e.preventDefault();
