@@ -14,8 +14,8 @@ topic_extractor = pipeline("text2text-generation", model="google/flan-t5-base")
 print("NLP models initialized successfully.")
 
 
-# ---------------------- 2. The Final Logic Core ----------------------
-# ✨ FIX: 'empathetic_text' is now a LIST for more variety.
+# ---------------------- 2.Logic Core ----------------------
+
 SUGGESTION_MAP = {
     "sadness": {
         "empathetic_text": [
@@ -68,14 +68,14 @@ SUGGESTION_MAP["gratitude"] = SUGGESTION_MAP["joy"]
 SUGGESTION_MAP["love"] = SUGGESTION_MAP["joy"]
 SUGGESTION_MAP["neutral"] = SUGGESTION_MAP["default"]
 
-# ---------------------- 3. Final, Robust Functions ----------------------
+# ---------------------- 3.Robust Functions ----------------------
 
 def extract_topic(journal_text):
     """
     Uses a generative model to extract the main topic in a few words.
     This is more reliable than asking for a full sentence.
     """
-    # ✨ FIX: A much safer and more direct prompt.
+    
     prompt = f"""
     Read the following journal entry and summarize the main topic or event in 2-5 words.
 
@@ -84,7 +84,7 @@ def extract_topic(journal_text):
     TOPIC:
     """
     try:
-        outputs = topic_extractor(prompt, max_length=15, num_beams=5, early_stopping=True)
+        outputs = topic_extractor(prompt, max_new_tokens=10, num_beams=5, early_stopping=True)
         return outputs[0]['generated_text'].strip()
     except Exception as e:
         print(f"Topic extraction failed: {e}")
@@ -96,19 +96,17 @@ def get_empathetic_suggestion(emotion, personalized_snippet):
     """
     suggestion_data = SUGGESTION_MAP.get(emotion, SUGGESTION_MAP["default"])
     
-    # ✨ FIX: Randomly choose from both the empathetic intro and the action.
+    
     chosen_intro = random.choice(suggestion_data['empathetic_text'])
     chosen_action = random.choice(suggestion_data['actionable_suggestion'])
     
-    # Weave the personalized snippet (if it exists) between the intro and the action.
-    # The space before personalized_snippet ensures correct spacing if it's empty.
     full_suggestion = f"{chosen_intro} {personalized_snippet} {chosen_action}"
     
     return full_suggestion
 
 def analyze_text(text):
     """
-    Main function to analyze text using the final hybrid approach.
+    Function to analyze text using the final hybrid approach.
     """
     if not text or not text.strip():
         # Logic for empty input remains the same
@@ -129,7 +127,7 @@ def analyze_text(text):
     else:
         primary_emotion = "neutral"
 
-    # Step 2: ✨ FIX: Extract a topic and format it into a safe, controlled snippet.
+    # Step 2: Extract a topic and format it into a safe, controlled snippet.
     topic = extract_topic(text)
     formatted_snippet = ""
     # Safety Check: only use the topic if it's short and seems valid.

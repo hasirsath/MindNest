@@ -3,6 +3,7 @@ from extensions import db
 
 class JournalEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(100), nullable=False)
     text = db.Column(db.Text, nullable=False)
     sentiment = db.Column(db.String(50))
     emotion = db.Column(db.String(50))

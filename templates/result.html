@@ -9,6 +9,20 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='result.css') }}">
+
+  <style>
+    .recommendations-container {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e0e0e0;
+    }
+    .media-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+</style>
 </head>
 <body>
 
@@ -40,6 +54,29 @@
   </div>
 
   <div class="suggestion"><strong>Suggestion:</strong> {{ result.suggestion }}</div>
+
+    {% if music_recs %}
+  <div class="recommendations-container">
+      <h3>Music to Match Your Mood 🎵</h3>
+      <div class="media-grid">
+          {% for track in music_recs %}
+          <div class="media-card">
+              <iframe
+                  style="border-radius:12px"
+                  src="https://open.spotify.com/embed/track/{{ track.id }}?utm_source=generator"
+                  width="100%"
+                  height="152"
+                  frameBorder="0"
+                  allowfullscreen=""
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy">
+              </iframe>
+          </div>
+          {% endfor %}
+        </div>
+    </div>
+      {% endif %}
+
 
   <div class="actions">
     <a href="{{ url_for('home') }}" class="btn edit">← Back to Journal</a>
