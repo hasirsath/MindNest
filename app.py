@@ -103,6 +103,7 @@ def verify_google_token():
 
 # ---------------------- Journal Feature Routes (Corrected) ----------------------
 from services.music import get_music_recommendations
+from services.media_client import get_media_recommendations
 
 @app.route('/analyze', methods=['POST'])
 @login_required
@@ -114,6 +115,7 @@ def analyze():
     result = analyze_text(entry_text)
     detected_mood = result['mood']
     music_recs = get_music_recommendations(detected_mood)
+    video_recs = get_media_recommendations(detected_mood)
     
     new_entry = JournalEntry(
         text=entry_text,
@@ -124,7 +126,7 @@ def analyze():
     )
     db.session.add(new_entry)
     db.session.commit()
-    return render_template('result.html', result=result, text=entry_text, music_recs=music_recs)
+    return render_template('result.html', result=result, text=entry_text, music_recs=music_recs, video_recs=video_recs)
 
 @app.route('/history')
 @login_required
