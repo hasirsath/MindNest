@@ -31,26 +31,26 @@ LOCAL_MUSIC_RECS = \
              {'id': '5SHpuW2qjkQtFRpE6P9Nks'}]}
 
 LOCAL_VIDEO_RECS = \
-{'sadness': [{"id": "https://www.youtube.com/watch?v=jIDcQRLyLiE"}, # Guided Meditation for Sadness
-        {"id": "https://www.youtube.com/watch?v=xhtz6Ir4IY8"},
-        {"id": "https://www.youtube.com/watch?v=E42TfodDzUk"},
-        {"id": "https://www.youtube.com/watch?v=H_uc-uQ3Nkc"}],
+{'sadness': [{"id": "jIDcQRLyLiE"}, # Guided Meditation for Sadness
+        {"id": "xhtz6Ir4IY8"},
+        {"id": "E42TfodDzUk"},
+        {"id": "H_uc-uQ3Nkc"}],
 'joy': [
         {"id": "ZbZSe6N_BXs"} # Happy Music Playlist
     ],
     'nervousness': [
-        {"id": "ihttps://www.youtube.com/watch?v=DbDoBzGY3vo"},
-        {"id": "https://www.youtube.com/watch?v=tuPW7oOudVc"} # 5-Minute Breathing Exercise
+        {"id": "iDbDoBzGY3vo"},
+        {"id": "tuPW7oOudVc"} # 5-Minute Breathing Exercise
     ],
     "anger": [
-        {"id": "https://www.youtube.com/watch?v=BsVq5R_F6RA"},# Video on Processing Anger
-        {"id": "https://www.youtube.com/watch?v=muDQm3S7mEI"}
+        {"id": "BsVq5R_F6RA"},# Video on Processing Anger
+        {"id": "muDQm3S7mEI"}
     ],
     "excitement": [
-        {"id": "https://www.youtube.com/watch?v=9lVB1-c69Sw"}, # Celebration Music
-        {"id": "https://www.youtube.com/watch?v=ekr2nIex040&list=PLgzTt0k8mXzF2fleyxQ17JxeccHFC8Gxp"}
+        {"id": "9lVB1-c69Sw"}, # Celebration Music
+        {"id": "ekr2nIex040"}
     ],
     "default": [
-        {"id": "https://www.youtube.com/watch?v=UV0mhY2Dxr0"},
-        {"id": "https://www.youtube.com/watch?v=xeXV1KoX034"} # Relaxing Nature Video
+        {"id": "UV0mhY2Dxr0"},
+        {"id": "xeXV1KoX034"} # Relaxing Nature Video
     ]}
