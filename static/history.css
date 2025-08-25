@@ -174,3 +174,17 @@ nav {
     font-size: 1.4rem;
     color: #333;
 }
+
+@media print {
+        body {
+            background-color: white;
+        }
+        nav, .footer, .actions, .history-header {
+            display: none !important;
+        }
+        .entry-card {
+            box-shadow: none;
+            border: 1px solid #ccc;
+            page-break-inside: avoid;
+        }
+    }

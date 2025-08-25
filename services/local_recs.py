@@ -31,26 +31,30 @@ LOCAL_MUSIC_RECS = \
              {'id': '5SHpuW2qjkQtFRpE6P9Nks'}]}
 
 LOCAL_VIDEO_RECS = \
-{'sadness': [{"id": "jIDcQRLyLiE"}, # Guided Meditation for Sadness
+{
+'sadness': [{"id": "jIDcQRLyLiE"}, # Guided Meditation for Sadness
         {"id": "xhtz6Ir4IY8"},
         {"id": "E42TfodDzUk"},
         {"id": "H_uc-uQ3Nkc"}],
 'joy': [
-        {"id": "ZbZSe6N_BXs"} # Happy Music Playlist
+        {"id": "ZbZSe6N_BXs"} ,# Happy Dance Compilation
+        {"id": "HgzGwKwLmgM"},
+        {"id": "5GJWxDKyk3A"},
+        {"id":"WxtJqyIyThU"},
     ],
-    'nervousness': [
+'nervousness': [
         {"id": "iDbDoBzGY3vo"},
         {"id": "tuPW7oOudVc"} # 5-Minute Breathing Exercise
     ],
-    "anger": [
+"anger": [
         {"id": "BsVq5R_F6RA"},# Video on Processing Anger
         {"id": "muDQm3S7mEI"}
     ],
-    "excitement": [
+"excitement": [
         {"id": "9lVB1-c69Sw"}, # Celebration Music
         {"id": "ekr2nIex040"}
     ],
-    "default": [
+"default": [
         {"id": "UV0mhY2Dxr0"},
         {"id": "xeXV1KoX034"} # Relaxing Nature Video
     ]}

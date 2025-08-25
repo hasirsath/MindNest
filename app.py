@@ -1,7 +1,8 @@
 # ---------------------- Imports ----------------------
 import os
 from functools import wraps
-from flask import Flask, render_template, request, redirect, url_for, session, abort
+from collections import Counter
+from flask import Flask, render_template, request, redirect, url_for, session, abort, Response
 from dotenv import load_dotenv
 
 # Google Sign-In verification
@@ -12,8 +13,11 @@ from google.auth.transport import requests as google_requests
 from extensions import db
 from services.nlp_analysis import analyze_text
 from models.db_models import JournalEntry
+from models.db_models import User
 
-
+#export
+import csv
+import io
 # ---------------------- Configuration ----------------------
 
 # Load environment variables from .env file
@@ -49,11 +53,25 @@ def login():
     if request.method == 'POST':
         # This block handles the simple username/password form
         if request.form.get('username') == USERNAME and request.form.get('password') == PASSWORD:
+            
+            user = User.query.filter_by(email="local@example.com").first()
+            if not user:
+                user = User(
+                    name="Local Test User",
+                    email="local@example.com",
+                    is_google_user=False
+                )
+                db.session.add(user)
+                db.session.commit()
+
             session.clear()
             session['logged_in'] = True
-            session['user_name'] = 'Local Test User'
+            session['user_id'] = user.id
+            session['user_name'] = user.name
+            session['user_email'] = user.email
+            session['user_picture'] = None
             # Adds the required user_id to the session for the local user
-            session['user_id'] = 'local_test_user_01'
+           
             print("SESSION AFTER LOGIN:", session)
             return redirect(url_for('home'))
         else:
@@ -84,22 +102,58 @@ def logout():
 
 @app.route('/verify-google-token', methods=['POST'])
 def verify_google_token():
-    """Receives the ID token from the client-side and creates a user session."""
+    """Receives an ID token from the client, verifies it, and manages the user session."""
     try:
-        token = request.json['token']
+        token = request.json.get('token')
+        if not token:
+            return {"success": False, "message": "Token is missing"}, 400
+
         google_client_id = os.getenv("GOOGLE_CLIENT_ID")
+
+        # Verify the token with Google
         id_info = id_token.verify_oauth2_token(
-            token, google_requests.Request(), google_client_id
+            token, 
+            google_requests.Request(),
+            google_client_id,
+            clock_skew_in_seconds=10
         )
+
+        # Check if user exists in our database
+        user = User.query.filter_by(email=id_info.get('email')).first()
+
+        if not user:
+            # User does not exist, create a new one
+            print(f"Creating new user for email: {id_info.get('email')}")
+            user = User(
+                name=id_info.get('name'),
+                email=id_info.get('email'),
+                picture=id_info.get('picture'), # Corrected field name
+                is_google_user=True
+            )
+            db.session.add(user)
+            db.session.commit()
+        else:
+            # User exists, ensure they are marked as a Google user
+            if not user.is_google_user:
+                user.is_google_user = True
+                db.session.commit()
+        
+        # Create a new session for the user
         session.clear()
         session['logged_in'] = True
-        session['user_id'] = id_info.get('sub') # Google's unique user ID
-        session['user_name'] = id_info.get('name')
-        session['user_email'] = id_info.get('email')
-        session['user_picture'] = id_info.get('picture')
+        session['user_id'] = user.id  # This is your app's local user ID
+        session['user_name'] = user.name
+        session['user_email'] = user.email
+        session['user_picture'] = user.picture
+        
         return {"success": True}
+    
+    except ValueError as e:
+        print(f"TOKEN VERIFICATION FAILED: {e}")
+        return {"success": False, "message": "Invalid or expired token", "details": str(e)}, 401
     except Exception as e:
-        return {"success": False, "message": str(e)}, 401
+        print(f"An unexpected error occurred: {e}")
+        return {"success": False, "message": "An internal error occurred"}, 500
 
 # ---------------------- Journal Feature Routes (Corrected) ----------------------
 from services.music import get_music_recommendations
@@ -177,6 +231,47 @@ def dashboard():
     
     return render_template('dashboard.html', dates=dates, moods=moods, emotions=emotions)
 
+@app.route('/users')
+@login_required
+def users():
+    google_users = User.query.filter_by(is_google_user=True).order_by(User.created_at.desc()).all()
+    local_users = User.query.filter_by(is_google_user=False).order_by(User.created_at.desc()).all()
+
+
+@app.route('/export/csv')
+@login_required
+def export_csv():
+    # 1. Fetch all of the user's journal entries
+    entries = JournalEntry.query.filter_by(user_id=session['user_id']).order_by(JournalEntry.date.asc()).all()
+
+    # 2. Use io.StringIO to create a text file in memory
+    string_io = io.StringIO()
+    csv_writer = csv.writer(string_io)
+
+    # 3. Write the header row
+    csv_writer.writerow(['Date', 'Sentiment', 'Emotion', 'Text', 'Suggestion'])
+
+    # 4. Write a row for each journal entry
+    for entry in entries:
+        csv_writer.writerow([
+            entry.date.strftime('%Y-%m-%d %H:%M:%S'),
+            entry.sentiment,
+            entry.emotion,
+            entry.text,
+            entry.suggestion
+        ])
+
+    # 5. Prepare the data to be sent back as a file
+    output = string_io.getvalue()
+    string_io.close()
+
+    # 6. Create a Flask Response to send the file to the user
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=journal_history.csv"}
+    )
+    
 # ---------------------- Run App ----------------------
 
 if __name__ == '__main__':

@@ -2,11 +2,14 @@
 from .local_recs import LOCAL_MUSIC_RECS # Import our local database
 
 # ✨ NEW: An alias map to group specific emotions into our main categories
+# In services/music_client.py
+
 EMOTION_ALIAS_MAP = {
     # Sadness Aliases
     "disappointment": "sadness",
     "grief": "sadness",
     "remorse": "sadness",
+    "embarrassment": "sadness",
     
     # Joy Aliases
     "excitement": "joy",
@@ -16,14 +19,27 @@ EMOTION_ALIAS_MAP = {
     "admiration": "joy",
     "approval": "joy",
     "caring": "joy",
+    "pride": "joy",
+    "relief": "joy",
+    "amusement": "joy",
+    "surprise": "joy",
     
     # Nervousness Aliases
     "fear": "nervousness",
+    "annoyance": "nervousness",
+    
+    # Anger Aliases
+    "disgust": "anger",
+    "disapproval": "anger",
+    
+    # Desire Alias (already has its own category, but good to keep consistent)
+    "desire": "desire",
 
     # Default/Neutral Aliases
     "neutral": "default",
     "curiosity": "default",
-    "realization": "default"
+    "realization": "default",
+    "confusion": "default"
 }
 
 def get_music_recommendations(emotion):

@@ -35,8 +35,12 @@
         <div class="nav-links">
             <a href="/">Home</a>
             <a href="/dashboard">Dashboard</a>
+             <a href="{{ url_for('export_csv') }}" class="btn export-btn">Export as CSV</a>
             {% if session.get('logged_in') %}
                 <a href="{{ url_for('logout') }}" class="nav-auth">Logout</a>
+                {% if session.get('user_picture') %}
+                    <img src="{{ session.get('user_picture') }}" alt="{{ session.get('user_name') }}" class="nav-avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-left:12px;border:2px solid rgba(255,255,255,0.6);" />
+                {% endif %}
             {% else %}
                 <a href="{{ url_for('login') }}" class="nav-auth">Login</a>
             {% endif %}

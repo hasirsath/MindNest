@@ -1,4 +1,4 @@
-# nlp_analysis.py
+# services/nlp_analyzer.py
 
 import random
 from transformers import pipeline
@@ -8,14 +8,14 @@ print("Initializing NLP models... This may take a moment on first startup.")
 
 sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 emotion_classifier = pipeline("text-classification", model="SamLowe/roberta-base-go_emotions", top_k=None)
-# We now call this 'topic_extractor' to better reflect its new job.
+# This model will now be used for more descriptive sentence generation
 topic_extractor = pipeline("text2text-generation", model="google/flan-t5-base")
 
 print("NLP models initialized successfully.")
 
 
-# ---------------------- 2.Logic Core ----------------------
-
+# ---------------------- 2. Logic Core ----------------------
+# This section remains the same
 SUGGESTION_MAP = {
     "sadness": {
         "empathetic_text": [
@@ -53,63 +53,144 @@ SUGGESTION_MAP = {
             "Capture this moment. Write down a few more details about why it feels so good, or take a picture related to the happy event."
         ]
     },
+    "desire": {
+        "empathetic_text": [
+            "It's clear that this is something you want very deeply. Acknowledging that strong desire is the first step.",
+            "That feeling of wanting something is a powerful motivator. Thank you for sharing what's on your mind.",
+            "Desire points us toward what we truly value. It's insightful to sit with that feeling and understand what it's telling you."
+        ],
+        "actionable_suggestion": [
+            "Try breaking down what you desire into one small, achievable step you could take this week. Small actions can make a big goal feel more real.",
+            "Consider writing down *why* you want this. Understanding the root of the desire can bring a lot of clarity and focus.",
+            "Channel that wanting energy into planning. Spend 15 minutes outlining the steps that could lead you toward this goal."
+        ]
+    },
+    "gratitude": {
+        "empathetic_text": [
+            "It's wonderful to see you acknowledging the good things. Gratitude is such a powerful feeling.",
+            "Holding onto moments of gratitude can be so uplifting. Thanks for sharing this one.",
+            "What a lovely thing to be thankful for. It's great that you're taking a moment to recognize it."
+        ],
+        "actionable_suggestion": [
+            "Share this feeling. Tell someone what you're grateful for—it can brighten their day, too.",
+            "Try 'gratitude journaling' right now. Write down two other small things from your day that brought you this feeling.",
+            "Take a moment to simply sit with this feeling of thankfulness and let it sink in. No need to do anything else."
+        ]
+    },
+
+    "anger": {
+        "empathetic_text": [
+            "Anger is a completely valid and normal emotion. It's a signal that a boundary may have been crossed or that something is unjust.",
+            "It's okay to feel angry about this. Let's find a constructive way to process that powerful energy.",
+            "Thank you for sharing this. Acknowledging anger, rather than suppressing it, is a healthy first step."
+        ],
+        "actionable_suggestion": [
+            "Try to channel that physical energy. Go for a brisk walk, do some quick exercise, or even just clench and unclench your fists to release the tension safely.",
+            "Consider writing down everything you're angry about in a 'brain dump'. You don't have to show it to anyone; the act of writing it out can be a release.",
+            "Listen to some high-energy music. Sometimes, matching the energy of the emotion with music can help you process and move through it."
+        ]
+    },
+
+    "remorse": {
+        "empathetic_text": [
+            "Feelings of remorse can be very heavy. It's a sign that you care deeply about your actions and their outcomes.",
+            "It's brave to confront feelings of regret. Thank you for being so honest in this space.",
+            "That feeling of wishing you could have done something differently is a powerful part of being human."
+        ],
+        "actionable_suggestion": [
+            "Focus on self-forgiveness. Write down one thing you've learned from the situation, as every experience is a chance to grow.",
+            "Think about what is within your control right now. Can you make amends, or can you plan to act differently in the future?",
+            "Remind yourself that everyone makes mistakes. Try talking to yourself with the same kindness you would offer a good friend in the same situation."
+        ]
+    },
     "default": {
         "empathetic_text": ["Thank you for sharing your thoughts today. Taking the time to journal is a wonderful act of self-care."],
         "actionable_suggestion": ["As you reflect, consider one small thing you're looking forward to this week."]
     }
 }
+# Aliases
+# In services/nlp_analyzer.py
 
 # Aliases
 SUGGESTION_MAP["disappointment"] = SUGGESTION_MAP["sadness"]
-SUGGESTION_MAP["anger"] = SUGGESTION_MAP["nervousness"]
-SUGGESTION_MAP["fear"] = SUGGESTION_MAP["nervousness"]
+SUGGESTION_MAP["grief"] = SUGGESTION_MAP["sadness"]
+SUGGESTION_MAP["remorse"] = SUGGESTION_MAP["sadness"]
+SUGGESTION_MAP["embarrassment"] = SUGGESTION_MAP["sadness"]
+
 SUGGESTION_MAP["excitement"] = SUGGESTION_MAP["joy"]
 SUGGESTION_MAP["gratitude"] = SUGGESTION_MAP["joy"]
 SUGGESTION_MAP["love"] = SUGGESTION_MAP["joy"]
+SUGGESTION_MAP["optimism"] = SUGGESTION_MAP["joy"]
+SUGGESTION_MAP["admiration"] = SUGGESTION_MAP["joy"]
+SUGGESTION_MAP["approval"] = SUGGESTION_MAP["joy"]
+SUGGESTION_MAP["caring"] = SUGGESTION_MAP["joy"]
+SUGGESTION_MAP["pride"] = SUGGESTION_MAP["joy"]
+SUGGESTION_MAP["relief"] = SUGGESTION_MAP["joy"]
+SUGGESTION_MAP["amusement"] = SUGGESTION_MAP["joy"]
+SUGGESTION_MAP["surprise"] = SUGGESTION_MAP["joy"]
+
+SUGGESTION_MAP["fear"] = SUGGESTION_MAP["nervousness"]
+SUGGESTION_MAP["annoyance"] = SUGGESTION_MAP["nervousness"]
+
+SUGGESTION_MAP["disgust"] = SUGGESTION_MAP["anger"]
+SUGGESTION_MAP["disapproval"] = SUGGESTION_MAP["anger"]
+
+# Ensure desire has its own entry or an alias
+SUGGESTION_MAP["desire"] = SUGGESTION_MAP.get("desire", SUGGESTION_MAP["default"])
+
 SUGGESTION_MAP["neutral"] = SUGGESTION_MAP["default"]
+SUGGESTION_MAP["curiosity"] = SUGGESTION_MAP["default"]
+SUGGESTION_MAP["realization"] = SUGGESTION_MAP["default"]
+SUGGESTION_MAP["confusion"] = SUGGESTION_MAP["default"]
 
-# ---------------------- 3.Robust Functions ----------------------
+# ---------------------- 3. Functions  ----------------------
 
-def extract_topic(journal_text):
+#  an advanced prompt to generate a full sentence.
+def generate_empathetic_sentence(journal_text):
     """
-    Uses a generative model to extract the main topic in a few words.
-    This is more reliable than asking for a full sentence.
+    Uses a generative model to create a full empathetic sentence that
+    acknowledges the user's specific situation without repeating it.
     """
-    
     prompt = f"""
-    Read the following journal entry and summarize the main topic or event in 2-5 words.
+    You are an empathetic companion. Your task is to read a user's journal entry and write a single, new sentence that paraphrases their core feeling or situation.
 
-    ENTRY: "{journal_text}"
+    **CRITICAL RULE:** You must NOT copy any phrases or full sentences from the user's entry. Your sentence must be your own words.Always speak in the second person (use "you" and "your").Do NOT use the first person ("I", "me", "my").Do NOT share your own opinions, feelings, or plans.Do NOT copy sentences from the user's entry.
 
-    TOPIC:
+    [Example]
+    User's Entry: "I studied all week for the test but I still failed. I feel like a total idiot."
+    Your Empathetic Paraphrase: "It sounds incredibly discouraging to have worked so hard and not gotten the result you hoped for."
+
+    [User's Entry]
+    "{journal_text}"
+
+    [Your Empathetic Paraphrase]
     """
     try:
-        outputs = topic_extractor(prompt, max_new_tokens=10, num_beams=5, early_stopping=True)
+        # Increased token limit to allow for a full, descriptive sentence.
+        outputs = topic_extractor(prompt, max_new_tokens=50, num_beams=5, early_stopping=True)
         return outputs[0]['generated_text'].strip()
     except Exception as e:
-        print(f"Topic extraction failed: {e}")
+        print(f"Empathetic sentence generation failed: {e}")
         return ""
 
+# This function remains the same, but will receive the new, longer snippet.
 def get_empathetic_suggestion(emotion, personalized_snippet):
-    """
-    Selects the appropriate suggestion and combines it with the personalized snippet.
-    """
-    suggestion_data = SUGGESTION_MAP.get(emotion, SUGGESTION_MAP["default"])
+    suggestion_data = SUGGESTION_MAP.get(emotion, SUGGESTION_MAP.get("default", {}))
+    chosen_intro = random.choice(suggestion_data.get('empathetic_text', [""]))
+    chosen_action = random.choice(suggestion_data.get('actionable_suggestion', [""]))
     
-    
-    chosen_intro = random.choice(suggestion_data['empathetic_text'])
-    chosen_action = random.choice(suggestion_data['actionable_suggestion'])
-    
-    full_suggestion = f"{chosen_intro} {personalized_snippet} {chosen_action}"
+    # We add an extra space only if the snippet exists, to keep formatting clean.
+    full_suggestion = f"{chosen_intro}{' ' + personalized_snippet if personalized_snippet else ''} {chosen_action}"
     
     return full_suggestion
 
+# ✨ UPDATED LOGIC: This function now calls the new sentence generator.
 def analyze_text(text):
     """
     Function to analyze text using the final hybrid approach.
     """
     if not text or not text.strip():
-        # Logic for empty input remains the same
+        # No changes to empty input handling
         default_suggestion_data = SUGGESTION_MAP["default"]
         chosen_intro = random.choice(default_suggestion_data['empathetic_text'])
         chosen_action = random.choice(default_suggestion_data['actionable_suggestion'])
@@ -121,21 +202,17 @@ def analyze_text(text):
     # Step 1: Core analysis
     sentiment_label = sentiment_analyzer(text)[0]['label']
     emotion_result = emotion_classifier(text)
+    primary_emotion = emotion_result[0][0]['label'] if emotion_result and emotion_result[0] else "neutral"
 
-    if emotion_result and emotion_result[0]:
-        primary_emotion = emotion_result[0][0]['label']
-    else:
-        primary_emotion = "neutral"
+    # Step 2: Generate the new, full empathetic sentence.
+    empathetic_sentence = generate_empathetic_sentence(text)
+    
+    # Safety check for overly long or repetitive sentences.
+    if len(empathetic_sentence.split()) > 30 or empathetic_sentence.lower() in text.lower():
+        empathetic_sentence = ""
 
-    # Step 2: Extract a topic and format it into a safe, controlled snippet.
-    topic = extract_topic(text)
-    formatted_snippet = ""
-    # Safety Check: only use the topic if it's short and seems valid.
-    if topic and len(topic.split()) < 8:
-        formatted_snippet = f"It sounds like you're dealing with {topic}."
-
-    # Step 3: Get the full suggestion
-    suggestion = get_empathetic_suggestion(primary_emotion, formatted_snippet)
+    # Step 3: Get the full suggestion using the new sentence
+    suggestion = get_empathetic_suggestion(primary_emotion, empathetic_sentence)
 
     # Step 4: Return the final dictionary
     return {
