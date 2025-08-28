@@ -13,3 +13,6 @@ env/
 *.lib
 *.exe
 client_secret.json 
+
+# Local Netlify folder
+.netlify

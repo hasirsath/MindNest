@@ -159,6 +159,7 @@ def verify_google_token():
 from services.music import get_music_recommendations
 from services.media_client import get_media_recommendations
 
+
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
@@ -168,9 +169,12 @@ def analyze():
 
     result = analyze_text(entry_text)
     detected_mood = result['mood']
-    music_recs = get_music_recommendations(detected_mood)
-    video_recs = get_media_recommendations(detected_mood)
-    
+
+    # One single call now
+    recommendations = get_media_recommendations(detected_mood)
+    music_recs = recommendations["music"]
+    video_recs = recommendations["videos"]
+
     new_entry = JournalEntry(
         text=entry_text,
         user_id=session['user_id'],     
@@ -180,7 +184,14 @@ def analyze():
     )
     db.session.add(new_entry)
     db.session.commit()
-    return render_template('result.html', result=result, text=entry_text, music_recs=music_recs, video_recs=video_recs)
+
+    return render_template(
+        'result.html',
+        result=result,
+        text=entry_text,
+        music_recs=music_recs,
+        video_recs=video_recs
+    )
 
 @app.route('/history')
 @login_required
