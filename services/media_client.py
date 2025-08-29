@@ -1,82 +1,73 @@
-# services/media_client.py
-from .local_recs import LOCAL_VIDEO_RECS # Import from our local database
-import requests
+from googleapiclient.discovery import build
+import random
+import os
+from urllib.parse import urlparse, parse_qs
 
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
+def extract_youtube_id(url):
+    """Extracts YouTube video ID from a URL."""
+    if "youtube.com/watch" in url:
+        query = urlparse(url)
+        return parse_qs(query.query).get("v", [None])[0]
+    elif "youtu.be" in url:
+        return url.split("/")[-1]
+    return None
 
+def get_trending_videos(region="US", max_results=10):
+    youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
+    request = youtube.videos().list(
+        part="snippet",
+        chart="mostPopular",
+        maxResults=max_results,
+        regionCode=region
+    )
+    response = request.execute()
 
-EMOTION_ALIAS_MAP = {
-    # Sadness Aliases
-    "disappointment": "sadness",
-    "grief": "sadness",
-    "remorse": "sadness",
-    "embarrassment": "sadness",
-    
-    # Joy Aliases
-    "excitement": "joy",
-    "gratitude": "joy",
-    "love": "joy",
-    "optimism": "joy",
-    "admiration": "joy",
-    "approval": "joy",
-    "caring": "joy",
-    "pride": "joy",
-    "relief": "joy",
-    "amusement": "joy",
-    "surprise": "joy",
-    
-    # Nervousness Aliases
-    "fear": "nervousness",
-    "annoyance": "nervousness",
-    
-    # Anger Aliases
-    "disgust": "anger",
-    "disapproval": "anger",
-    
-    # Desire Alias (already has its own category, but good to keep consistent)
-    "desire": "desire",
+    videos = []
+    for item in response["items"]:
+        video_id = item["id"]
+        videos.append({
+            "id": video_id,  # ✅ for embed
+            "title": item["snippet"]["title"],
+            "thumbnail": item["snippet"]["thumbnails"]["medium"]["url"],
+            "url": f"https://www.youtube.com/watch?v={video_id}"
+        })
+    return videos
 
-    # Default/Neutral Aliases
-    "neutral": "default",
-    "curiosity": "default",
-    "realization": "default",
-    "confusion": "default"
-}
-
-# services/music_client.py
-import requests
-from services.emotion_map import EMOTION_ALIAS_MAP
-from services.emotion_playlists import get_random_playlist_keyword
-
-PROXY_URL = "https://prismatic-florentine-2b806d.netlify.app/.netlify/functions/getMusic"
-
-def get_music_recommendations(emotion):
-    """Fetch music recommendations for detected emotion."""
-    try:
-        # Normalize emotion
-        canonical_emotion = EMOTION_ALIAS_MAP.get(emotion.lower(), "default")
-
-        # Random keyword for variety
-        keyword = get_random_playlist_keyword(canonical_emotion)
-
-        # Always pass `query`
-        response = requests.get(PROXY_URL, params={"query": keyword})
-        response.raise_for_status()
-        tracks = response.json()
-
-        # Return usable results
-        return [{"id": track['id'], "keyword": keyword} for track in tracks]
-
-    except Exception as e:
-        print(f"Error calling proxy function: {e}")
-        return []
-
-
-
-def get_media_recommendations(emotion):
-    """Wrapper so app.py can call one function (future-proof if video is added)."""
-    music = get_music_recommendations(emotion)
-    return {
-        "music": music,
-        "videos": []  # placeholder, so no error if app expects videos
+def get_emotion_videos(emotion):
+    emotion_map = {
+        "happy": ["upbeat music", "funny videos", "motivational speech"],
+        "sad": ["relaxing music", "inspirational talk", "uplifting songs"],
+        "angry": ["calming meditation", "peaceful nature sounds"],
+        "anxious": ["guided meditation", "soothing music", "yoga"],
+        "neutral": ["trending news", "popular playlists"]
     }
+    query = random.choice(emotion_map.get(emotion, ["popular music"]))
+
+    youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
+    request = youtube.search().list(
+        part="snippet",
+        q=query,
+        type="video",
+        maxResults=5
+    )
+    response = request.execute()
+
+    videos = []
+    for item in response["items"]:
+        video_id = item["id"]["videoId"]
+        videos.append({
+            "id": video_id,  # ✅ for embed
+            "title": item["snippet"]["title"],
+            "thumbnail": item["snippet"]["thumbnails"]["medium"]["url"],
+            "url": f"https://www.youtube.com/watch?v={video_id}"
+        })
+    return videos
+
+def get_media_recommendations(emotion, region="IN"):
+    trending = get_trending_videos(region=region, max_results=2)
+    emotion_based = get_emotion_videos(emotion)
+    combined = trending + emotion_based
+    random.shuffle(combined)
+    return combined

@@ -22,7 +22,28 @@
         gap: 1.5rem;
         margin-top: 1rem;
     }
-</style>
+    .media-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        padding: 1rem;
+        text-align: center;
+        transition: transform 0.2s ease;
+    }
+    .media-card:hover {
+        transform: translateY(-4px);
+    }
+    .media-card p {
+        margin-top: 0.8rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+        color: #333;
+    }
+    iframe {
+        width: 100%;
+        border-radius: 12px;
+    }
+  </style>
 </head>
 <body>
 
@@ -58,31 +79,46 @@
 
   <div class="suggestion"><strong>Suggestion:</strong> {{ result.suggestion }}</div>
 
-   {% if music_recs %}
-<div class="recommendations-container">
-    <h3>Music to Match Your Mood 🎵</h3>
-    <div class="media-grid">
-        {% for track in music_recs %}
-        <div class="media-card">
-            <iframe src="https://open.spotify.com/embed/track/{{ track.id }}?utm_source=generator" ...></iframe>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
+  {% if music_recs %}
+  <div class="recommendations-container">
+      <h3>Music to Match Your Mood 🎵</h3>
+      <div class="media-grid">
+          {% for playlist in music_recs %}
+          <div class="media-card">
+              <iframe style="border-radius:12px"
+                      src="https://open.spotify.com/embed/playlist/{{ playlist.id }}?utm_source=generator"
+                      height="380" frameborder="0" 
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"></iframe>
+              <p>{{ playlist.title }}</p>
+          </div>
+          {% endfor %}
+      </div>
+  </div>
+  {% endif %}
+
 
 {% if video_recs %}
-<div class="recommendations-container">
-    <h3>Helpful Videos 📺</h3>
-    <div class="media-grid">
-        {% for video in video_recs %}
-        <div class="media-card">
-            <iframe src="https://www.youtube.com/embed/{{ video.id }}" ...></iframe>
-        </div>
-        {% endfor %}
-    </div>
-</div>
+  <div class="recommendations-container">
+      <h3>Video Recommendations 🎥</h3>
+      <div class="media-grid">
+          {% for video in video_recs %}
+          <div class="media-card">
+              <iframe width="300" height="180"
+                      src="https://www.youtube.com/embed/{{ video.id }}?rel=0&autoplay=0"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen>
+              </iframe>
+              <p>{{ video.title }}</p>
+          </div>
+          {% endfor %}
+      </div>
+  </div>
 {% endif %}
+
+
+
 
 
   <div class="actions">
@@ -94,7 +130,7 @@
 
 <script>
   const mood = "{{ result.mood|lower }}";
-    const emotion = "{{ result.sentiment|lower }}";
+  const emotion = "{{ result.sentiment|lower }}";
 </script>
 
 </body>

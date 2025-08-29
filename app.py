@@ -156,8 +156,9 @@ def verify_google_token():
         return {"success": False, "message": "An internal error occurred"}, 500
 
 # ---------------------- Journal Feature Routes (Corrected) ----------------------
-from services.music import get_music_recommendations
+
 from services.media_client import get_media_recommendations
+from services.music import get_music_recommendations
 
 
 @app.route('/analyze', methods=['POST'])
@@ -167,24 +168,28 @@ def analyze():
     if not entry_text.strip():
         return redirect(url_for('home'))
 
+    # 🧠 Run NLP analysis
     result = analyze_text(entry_text)
     detected_mood = result['mood']
 
-    # One single call now
-    recommendations = get_media_recommendations(detected_mood)
-    music_recs = recommendations["music"]
-    video_recs = recommendations["videos"]
+    # 🎶 Get Spotify playlists dynamically
+    music_recs = get_music_recommendations(detected_mood)
 
+    # 🎥 Get YouTube video recommendations
+    video_recs = get_media_recommendations(detected_mood, region="IN")[:2] 
+    
+
+    # 📝 Save journal entry
     new_entry = JournalEntry(
         text=entry_text,
-        user_id=session['user_id'],     
-        sentiment=result['sentiment'],  
-        emotion=result['mood'],         
+        user_id=session['user_id'],
+        sentiment=result['sentiment'],
+        emotion=result['mood'],
         suggestion=result['suggestion']
     )
     db.session.add(new_entry)
     db.session.commit()
-
+    
     return render_template(
         'result.html',
         result=result,
@@ -192,6 +197,7 @@ def analyze():
         music_recs=music_recs,
         video_recs=video_recs
     )
+
 
 @app.route('/history')
 @login_required

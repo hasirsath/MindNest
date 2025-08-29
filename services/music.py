@@ -1,29 +1,45 @@
-# services/music.py
 import requests
+import base64
+import os
 
-# Netlify proxy endpoint
-PROXY_URL = "https://your-app.netlify.app/.netlify/functions/getMusic"
+# Load credentials from environment (safe practice)
+SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 
-# Emotion → playlist keyword
-EMOTION_KEYWORDS = {
-    "joy": ["happy upbeat songs", "summer vibes playlist", "dance hits"],
-    "sadness": ["sad acoustic songs", "heartbreak indie", "mellow chill"],
-    "anger": ["rock workout songs", "metal rage playlist"],
-    "fear": ["calm piano", "soothing acoustic", "relaxing ambient"],
-    "neutral": ["focus study music", "chill lofi beats", "background vibes"]
-}
+def get_access_token():
+    """
+    Fetches a Spotify access token using Client Credentials Flow.
+    """
+    auth_string = f"{SPOTIFY_CLIENT_ID}:{SPOTIFY_CLIENT_SECRET}"
+    auth_bytes = auth_string.encode("utf-8")
+    auth_base64 = base64.b64encode(auth_bytes).decode("utf-8")
 
-def get_music_recommendations(emotion: str):
-    """Get Spotify playlist recs via Netlify proxy."""
-    keywords = EMOTION_KEYWORDS.get(emotion.lower(), ["chill vibes"])
-    query = keywords[0]  # pick first keyword for now
+    url = "https://accounts.spotify.com/api/token"
+    headers = {"Authorization": f"Basic {auth_base64}"}
+    data = {"grant_type": "client_credentials"}
 
-    try:
-        resp = requests.get(PROXY_URL, params={"query": query})
-        resp.raise_for_status()
-        data = resp.json()
-        print(f"[Music API] Retrieved {len(data)} tracks for emotion '{emotion}' with query '{query}'")
-        return data if isinstance(data, list) else []
-    except Exception as e:
-        print(f"[Music API Error] {e}")
-        return []
+    response = requests.post(url, headers=headers, data=data)
+    response.raise_for_status()
+    return response.json()["access_token"]
+
+def get_music_recommendations(mood: str, limit: int = 2):
+    """
+    Searches Spotify for playlists related to a mood (e.g., happy, sad).
+    """
+    token = get_access_token()
+    url = f"https://api.spotify.com/v1/search?q={mood}%20mood&type=playlist&limit={limit}"
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+
+    playlists = []
+    for item in data.get("playlists", {}).get("items", []):
+        playlists.append({
+            "title": item["name"],
+            "id": item["id"],  # embed needs this
+            "url": item["external_urls"]["spotify"]
+        })
+    
+    return playlists

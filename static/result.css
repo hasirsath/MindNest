@@ -112,29 +112,7 @@ h2 {
     color: #fff;
 }
 
-/* .actions {
-  text-align: center;
-  margin-top: 30px;
-}
 
-.actions a, .actions button {
-  display: inline-block;
-  margin: 10px 12px;
-  padding: 12px 24px;
-  border-radius: 8px;
-  border: none;
-  background: #36a2eb;
-  color: #fff;
-  font-size: 1em;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.25s ease;
-}
-
-.actions a:hover,
-.actions button:hover {
-  background: #258ad6;
-} */
 
 /* Navbar */
 nav {
@@ -176,4 +154,62 @@ nav {
   font-size: 1.4em;
   font-weight: bold;
   color: #333;
+}
+
+/* Section title */
+.section-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 2rem 0 1rem;
+  color: #333;
+  text-align: center;
+}
+
+.video-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 videos per row */
+    gap: 20px;
+    margin-top: 20px;
+    
+}
+
+.video-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.video-card:hover {
+    transform: scale(1.05);
+}
+
+.video-card img {
+    width: 100%;
+    height: 200px; /* adjust */
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.video-card a {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    color: #2d3748;
+    text-decoration: none;
+}
+
+.video-card a:hover {
+    color: #007bff;
+}
+
+.video-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: left;   /* forces heading to align left */
+    display: block;
 }
