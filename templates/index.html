@@ -9,28 +9,34 @@
 </head>
 <body>
     <nav>
-        <div class="nav-container">
-            <span class="logo">🧠 MindNest</span>
-            <div class="nav-links">
-                <a href="/dashboard">Dashboard</a>
-                <a href="/history">History</a>
-                {% if session.get('logged_in') %}
-                    <a href="/logout">Logout</a>
-                    {% if session.get('user_picture') %}
-                        <img src="{{ session.get('user_picture') }}" alt="{{ session.get('user_name') }}" class="nav-avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-left:12px;border:2px solid rgba(255,255,255,0.6);" />
-                    {% endif %}
-                {% else %}
-                    <a href="/login">Login</a>
+    <div class="nav-container">
+        <span class="logo">🧠 MindNest</span>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/history">History</a>
+            {% if session.get('logged_in') %}
+                <a href="/logout">Logout</a>
+                {% if session.get('user_picture') %}
+                    <a href="{{ url_for('profile') }}">
+                        <img src="{{ session.get('user_picture') }}" 
+                             alt="{{ session.get('user_name') }}" 
+                             class="nav-avatar" />
+                    </a>
                 {% endif %}
-            </div>
+            {% else %}
+                <a href="/login">Login</a>
+            {% endif %}
         </div>
-    </nav>
+    </div>
+</nav>
+
 
     <div class="main-card">
         <h2>How are you feeling today?</h2>
         <form id="journalForm" method="POST" action="/analyze" autocomplete="off">
             <div class="textarea-wrapper">
     <textarea name="entry" id="entry" placeholder="Type or speak your journal entry..."></textarea>
+    <button> <a href="/analyze_face" style="color: white; text-decoration: none;">Face Emotion</a> </button>
     <button type="button" id="micBtn" class="mic-button">🎤</button>
 
   <button type="submit">Submit</button>

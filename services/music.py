@@ -20,11 +20,13 @@ def get_access_token():
 
     response = requests.post(url, headers=headers, data=data)
     response.raise_for_status()
-    return response.json()["access_token"]
+    return response.json().get("access_token")
+
 
 def get_music_recommendations(mood: str, limit: int = 2):
     """
     Searches Spotify for playlists related to a mood (e.g., happy, sad).
+    Ensures missing fields won't break the app.
     """
     token = get_access_token()
     url = f"https://api.spotify.com/v1/search?q={mood}%20mood&type=playlist&limit={limit}"
@@ -36,10 +38,12 @@ def get_music_recommendations(mood: str, limit: int = 2):
 
     playlists = []
     for item in data.get("playlists", {}).get("items", []):
+        if not item:
+            continue  # skip None entries safely
         playlists.append({
-            "title": item["name"],
-            "id": item["id"],  # embed needs this
-            "url": item["external_urls"]["spotify"]
+            "title": item.get("name", "Untitled Playlist"),
+            "id": item.get("id", ""),  # required for embed
+            "url": item.get("external_urls", {}).get("spotify", "")
         })
     
     return playlists

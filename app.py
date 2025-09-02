@@ -2,8 +2,14 @@
 import os
 from functools import wraps
 from collections import Counter
-from flask import Flask, render_template, request, redirect, url_for, session, abort, Response
+from flask import Flask, render_template, request, redirect, url_for, session, abort, Response, flash
 from dotenv import load_dotenv
+#---------change------------
+import base64
+from io import BytesIO
+from PIL import Image
+from deepface import DeepFace
+#------------------change over-------------------------------
 
 # Google Sign-In verification
 from google.oauth2 import id_token
@@ -11,17 +17,29 @@ from google.auth.transport import requests as google_requests
 
 # Local project imports
 from extensions import db
-from services.nlp_analysis import analyze_text
+from services.nlp_analysis import analyze_text, get_detailed_suggestion
 from models.db_models import JournalEntry
 from models.db_models import User
 
 #export
 import csv
 import io
-# ---------------------- Configuration ----------------------
 
-# Load environment variables from .env file
+#encryption
+from cryptography.fernet import Fernet
+import os
+
+print("Loading DeepFace model... (this may take 20s the first time)")
+deepface_model = DeepFace.build_model("VGG-Face")
+print("DeepFace model loaded!")
+
 load_dotenv()
+
+FERNET_MASTER_KEY = os.getenv("FERNET_MASTER_KEY")
+if not FERNET_MASTER_KEY:
+    raise ValueError("FERNET_MASTER_KEY not set in environment variables!")
+fernet = Fernet(FERNET_MASTER_KEY)
+
 
 # Flask app setup
 app = Flask(__name__)
@@ -31,8 +49,9 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 db.init_app(app)
 
 
-USERNAME = 'user'
-PASSWORD = 'pass123'
+
+# USERNAME = 'user'
+# PASSWORD = 'pass123'
 
 # ---------------------- Utility ----------------------
 
@@ -47,38 +66,62 @@ def login_required(f):
 
 # ---------------------- Core Routes ----------------------
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    error = None
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not name or not email or not password or not confirm_password:
+            error = "Please fill in all fields."
+        elif password != confirm_password:
+            error = "Passwords do not match."
+        else:
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user:
+                error = "Email already registered."
+            else:
+                new_user = User(
+                    name=name,
+                    email=email,
+                    is_google_user=False,
+                    password=generate_password_hash(password)  # hashed
+                )
+                db.session.add(new_user)
+                db.session.commit()
+                return redirect(url_for('login'))
+
+    return render_template('signup.html', error=error)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
     if request.method == 'POST':
-        # This block handles the simple username/password form
-        if request.form.get('username') == USERNAME and request.form.get('password') == PASSWORD:
-            
-            user = User.query.filter_by(email="local@example.com").first()
-            if not user:
-                user = User(
-                    name="Local Test User",
-                    email="local@example.com",
-                    is_google_user=False
-                )
-                db.session.add(user)
-                db.session.commit()
-
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if user and check_password_hash(user.password, password):
             session.clear()
             session['logged_in'] = True
             session['user_id'] = user.id
             session['user_name'] = user.name
             session['user_email'] = user.email
             session['user_picture'] = None
-            # Adds the required user_id to the session for the local user
-           
-            print("SESSION AFTER LOGIN:", session)
             return redirect(url_for('home'))
         else:
-            error = 'Invalid username or password.'
+            error = 'Invalid email or password.'
 
     google_client_id = os.getenv("GOOGLE_CLIENT_ID")
     return render_template('login.html', error=error, google_client_id=google_client_id)
+
 
 
 
@@ -99,6 +142,16 @@ def home():
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+@app.route('/profile')
+@login_required
+def profile():
+    user = {
+        "name": session.get('user_name'),
+        "email": session.get('user_email'),
+        "picture": session.get('user_picture')
+    }
+    return render_template('profile.html', user=user)
 
 @app.route('/verify-google-token', methods=['POST'])
 def verify_google_token():
@@ -177,11 +230,12 @@ def analyze():
 
     # 🎥 Get YouTube video recommendations
     video_recs = get_media_recommendations(detected_mood, region="IN")[:2] 
-    
 
-    # 📝 Save journal entry
+    # 🔒 Encrypt text before saving
+    encrypted_text = fernet.encrypt(entry_text.encode()).decode()
+
     new_entry = JournalEntry(
-        text=entry_text,
+        text=encrypted_text,
         user_id=session['user_id'],
         sentiment=result['sentiment'],
         emotion=result['mood'],
@@ -193,54 +247,67 @@ def analyze():
     return render_template(
         'result.html',
         result=result,
-        text=entry_text,
+        text=entry_text,  # show decrypted/original text in UI
         music_recs=music_recs,
         video_recs=video_recs
     )
+
 
 
 @app.route('/history')
 @login_required
 def history():
     entries = JournalEntry.query.filter_by(user_id=session['user_id']).order_by(JournalEntry.date.desc()).all()
+
+    # 🔓 Decrypt before rendering
+    for entry in entries:
+        entry.text = fernet.decrypt(entry.text.encode()).decode()
+
     return render_template('history.html', entries=entries)
 
-@app.route('/delete/<int:entry_id>', methods=['POST'])
-@login_required
-def delete_entry(entry_id):
-    entry = JournalEntry.query.get_or_404(entry_id)
-    if entry.user_id != session['user_id']:
-        abort(403) # Forbidden
-        
-    db.session.delete(entry)
-    db.session.commit()
-    return '', 204
 
 @app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
 @login_required
 def edit_entry(entry_id):
     entry = JournalEntry.query.get_or_404(entry_id)
     if entry.user_id != session['user_id']:
-        abort(403) # Forbidden
+        abort(403) 
 
     if request.method == 'POST':
-        entry.text = request.form['entry']
-        result = analyze_text(entry.text)
+        updated_text = request.form['entry']
+        encrypted_text = fernet.encrypt(updated_text.encode()).decode()
+
+        entry.text = encrypted_text
+        result = analyze_text(updated_text)
         entry.sentiment = result['sentiment']
         entry.emotion = result['mood']
         entry.suggestion = result['suggestion']
         db.session.commit()
         return redirect(url_for('history'))
-        
+
+    # 🔓 Decrypt before rendering edit form
+    entry.text = fernet.decrypt(entry.text.encode()).decode()
     return render_template('edit.html', entry=entry)
+
+@app.route('/delete/<int:id>', methods=['POST'])
+def delete_entry(id):
+    entry = JournalEntry.query.get(id)
+    if entry:
+        db.session.delete(entry)
+        db.session.commit()
+    return redirect(url_for('history'))
+
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    print("SESSION BEFORE DASHBOARD:", session)
     entries = JournalEntry.query.filter_by(
         user_id=session['user_id']
     ).order_by(JournalEntry.date.asc()).all()
+
+    # 🔓 Decrypt for charts if needed
+    for entry in entries:
+        entry.text = fernet.decrypt(entry.text.encode()).decode()
 
     dates = [entry.date.strftime('%Y-%m-%d') for entry in entries]
     moods = [entry.sentiment for entry in entries]
@@ -248,47 +315,125 @@ def dashboard():
     
     return render_template('dashboard.html', dates=dates, moods=moods, emotions=emotions)
 
+
 @app.route('/users')
 @login_required
 def users():
     google_users = User.query.filter_by(is_google_user=True).order_by(User.created_at.desc()).all()
     local_users = User.query.filter_by(is_google_user=False).order_by(User.created_at.desc()).all()
+    return render_template('users.html', google_users=google_users, local_users=local_users)
 
 
 @app.route('/export/csv')
 @login_required
 def export_csv():
-    # 1. Fetch all of the user's journal entries
     entries = JournalEntry.query.filter_by(user_id=session['user_id']).order_by(JournalEntry.date.asc()).all()
 
-    # 2. Use io.StringIO to create a text file in memory
     string_io = io.StringIO()
     csv_writer = csv.writer(string_io)
 
-    # 3. Write the header row
     csv_writer.writerow(['Date', 'Sentiment', 'Emotion', 'Text', 'Suggestion'])
 
-    # 4. Write a row for each journal entry
     for entry in entries:
+        decrypted_text = fernet.decrypt(entry.text.encode()).decode()
         csv_writer.writerow([
             entry.date.strftime('%Y-%m-%d %H:%M:%S'),
             entry.sentiment,
             entry.emotion,
-            entry.text,
+            decrypted_text,
             entry.suggestion
         ])
 
-    # 5. Prepare the data to be sent back as a file
     output = string_io.getvalue()
     string_io.close()
 
-    # 6. Create a Flask Response to send the file to the user
     return Response(
         output,
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment;filename=journal_history.csv"}
     )
-    
+
+@app.route('/about')
+def about():
+    return render_template('About.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+# ---------------------- Face Detection ----------------------
+@app.route('/analyze_face', methods=['GET', 'POST'])
+@login_required
+def analyze_face():
+    emotion, suggestion = None, None
+    upload_folder = os.path.join('static', 'uploads')
+    os.makedirs(upload_folder, exist_ok=True)
+
+    try:
+        if request.method == 'POST':
+            # Webcam input
+            if 'webcam_image' in request.form and request.form['webcam_image']:
+                img_data = request.form['webcam_image']
+                header, encoded = img_data.split(',', 1)
+                img_bytes = base64.b64decode(encoded)
+                filepath = os.path.join(upload_folder, 'webcam_capture.png')
+                Image.open(BytesIO(img_bytes)).save(filepath)
+
+            # File upload
+            elif 'face_image' in request.files:
+                file = request.files['face_image']
+                if not file.filename:
+                    flash('No selected file')
+                    return redirect(request.url)
+                filepath = os.path.join(upload_folder, file.filename)
+                file.save(filepath)
+
+            else:
+                flash('No image provided')
+                return redirect(request.url)
+
+            # Run DeepFace
+            result = DeepFace.analyze(
+                img_path=filepath,
+                actions=['emotion'],
+                enforce_detection=False,
+                model=deepface_model
+            )
+
+            if isinstance(result, list):
+                emotion = result[0].get('dominant_emotion', 'No face detected')
+            else:
+                emotion = result.get('dominant_emotion', 'No face detected')
+
+            if emotion and emotion != 'No face detected':
+                suggestion = get_detailed_suggestion('Neutral', emotion)
+
+                # Save to history (webcam only, optional)
+                if 'webcam_image' in request.form:
+                    new_entry = JournalEntry(
+                        text='Webcam Entry',
+                        user_id=session['user_id'],
+                        sentiment='N/A',
+                        emotion=emotion,
+                        suggestion=suggestion
+                    )
+                    db.session.add(new_entry)
+                    db.session.commit()
+
+        return render_template('analyze_face.html', emotion=emotion, suggestion=suggestion)
+
+    except Exception as e:
+        flash(f'Error analyzing image: {e}')
+        return redirect(request.url)
+    finally:
+        if 'filepath' in locals() and os.path.exists(filepath):
+            os.remove(filepath)
+
+
 # ---------------------- Run App ----------------------
 
 if __name__ == '__main__':
