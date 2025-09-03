@@ -12,10 +12,12 @@
     <div class="nav-container">
         <span class="logo">🧠 MindNest</span>
         <div class="nav-links">
+            <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('contact') }}">Contact</a>
             <a href="/dashboard">Dashboard</a>
             <a href="/history">History</a>
+        
             {% if session.get('logged_in') %}
-                <a href="/logout">Logout</a>
                 {% if session.get('user_picture') %}
                     <a href="{{ url_for('profile') }}">
                         <img src="{{ session.get('user_picture') }}" 

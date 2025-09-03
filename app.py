@@ -3,7 +3,7 @@ import os
 from functools import wraps
 from collections import Counter
 from flask import Flask, render_template, request, redirect, url_for, session, abort, Response, flash
-from dotenv import load_dotenv
+
 #---------change------------
 import base64
 from io import BytesIO
@@ -33,8 +33,17 @@ print("Loading DeepFace model... (this may take 20s the first time)")
 deepface_model = DeepFace.build_model("VGG-Face")
 print("DeepFace model loaded!")
 
+from dotenv import load_dotenv
 load_dotenv()
 
+# ---- START OF TEMPORARY DEBUG CODE ----
+print("--- Environment Variables Currently Loaded ---")
+# This loop prints every single environment variable your app can see
+for key, value in os.environ.items():
+    if "KEY" in key:  # We only print keys to keep the output clean
+        print(f"Found Key: '{key}'")
+print("------------------------------------------")
+# ---- END OF TEMPORARY DEBUG CODE ----
 FERNET_MASTER_KEY = os.getenv("FERNET_MASTER_KEY")
 if not FERNET_MASTER_KEY:
     raise ValueError("FERNET_MASTER_KEY not set in environment variables!")
@@ -229,7 +238,7 @@ def analyze():
     music_recs = get_music_recommendations(detected_mood)
 
     # 🎥 Get YouTube video recommendations
-    video_recs = get_media_recommendations(detected_mood, region="IN")[:2] 
+    video_recs = get_media_recommendations(detected_mood)[:2] 
 
     # 🔒 Encrypt text before saving
     encrypted_text = fernet.encrypt(entry_text.encode()).decode()

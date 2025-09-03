@@ -1,79 +1,80 @@
+/* General Reset */
 body {
     font-family: 'Inter', sans-serif;
-    background: #fff7f0;
+    background: #fffaf5; /* soft cream */
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    color: #4b3b2f; /* warm brown */
 }
 
+/* Navbar */
 nav {
-    width: 100%;
-    background: linear-gradient(90deg, #fcd9b8, #f8c3ae);
-    padding: 14px 24px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    border-radius: 0 0 18px 18px;
-    position: sticky;
-    top: 0;
+    background: #e9dcc5; /* warm beige */
+    padding: 16px 48px;
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    right: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     z-index: 1000;
 }
 
-.nav-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: inline-block;
-    object-fit: cover;
-    z-index: 1;
-    cursor: pointer;
-}
-
-
 .nav-container {
-    max-width: 1100px;
-    margin: 0 auto;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-}
-
-.logo {
-    font-size: 1.4em;
-    font-weight: 600;
-    color: #333;
+    justify-content: space-between;
 }
 
 .nav-links {
     display: flex;
-    align-items: center;   /* ensures text and image vertically align */
-    gap: 20px;             /* consistent spacing between links */
+    align-items: center;
+    gap: 20px;
+    margin-left: auto;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #5a4635; /* deep brown */
+}
+
+.logo img {
+    margin-right: 8px;
+    height: 28px;
+    width: 28px;
 }
 
 .nav-links a {
     text-decoration: none;
-    color: #333;
+    color: #4b3b2f;
     font-weight: 500;
-    transition: color 0.3s;
+    font-size: 1rem;
+    transition: color 0.2s;
 }
 
 .nav-links a:hover {
-    color: #1976d2;
+    color: #2e241c;
 }
 
+/* Avatar */
 .nav-avatar {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.7);
     cursor: pointer;
 }
 
 
+/* Main Card */
 .main-card {
-    margin-top: 60px;
+    margin-top: 130px;
     background: #fff;
     padding: 40px 32px;
     border-radius: 20px;
@@ -85,33 +86,36 @@ nav {
 
 h2 {
     font-weight: 600;
-    color: #333;
+    color: #3a2f24;
     margin-bottom: 30px;
 }
 
+/* Textarea */
 textarea {
     width: 100%;
     height: 150px;
-    border: 1px solid #ddd;
+    border: 1px solid #e0d4c8;
     border-radius: 12px;
     padding: 16px;
     font-size: 1em;
     font-family: 'Inter', sans-serif;
     resize: none;
     box-sizing: border-box;
-    background: #fff;
+    background: #fffdf9;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
     outline: none;
+    color: #3a2f24;
 }
 
 textarea:focus {
-    border-color: #a3c9f7;
-    box-shadow: 0 0 0 3px rgba(163, 201, 247, 0.4);
+    border-color: #c9a26d;
+    box-shadow: 0 0 0 3px rgba(201, 162, 109, 0.35);
 }
 
+/* Buttons */
 button {
     margin-top: 20px;
-    background-color: #4e89ff;
+    background-color: #8b5e34; /* coffee brown */
     color: #fff;
     border: none;
     padding: 12px 28px;
@@ -119,36 +123,37 @@ button {
     border-radius: 25px;
     cursor: pointer;
     font-weight: 600;
-    transition: background 0.3s;
+    transition: all 0.3s;
 }
 
-img.nav-avatar
 button:hover {
-    background-color: #3572e2;
+    background-color: #6b4524;
 }
 
+/* Warning text */
 .warning {
-    color: #888;
+    color: #7a6a58;
     margin-top: 12px;
     font-size: 0.95em;
     display: none;
 }
 
+/* View history link */
 .view-history {
     margin-top: 22px;
     display: inline-block;
     font-weight: 500;
     font-size: 1.05em;
-    color: #007bff;
+    color: #8b5e34;
     text-decoration: none;
 }
 
 .view-history:hover {
     text-decoration: underline;
+    color: #6b4524;
 }
 
-/* Voice css */
-
+/* Voice button */
 .mic-container {
   position: absolute;
   bottom: 10px;
@@ -174,17 +179,17 @@ button:hover {
 
 .mic-button.active {
   animation: pulse 1s infinite;
-  background: #eaf4ff;
+  background: #f7efe6;
 }
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4);
+    box-shadow: 0 0 0 0 rgba(139, 94, 52, 0.4);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+    box-shadow: 0 0 0 10px rgba(139, 94, 52, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+    box-shadow: 0 0 0 0 rgba(139, 94, 52, 0);
   }
 }

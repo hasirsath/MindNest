@@ -6,27 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='history.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='footer.css') }}">
     
-    <style>
-        /* Sentiment Tag Colors */
-        .tag-positive { background-color: #28a745; color: white; }
-        .tag-negative { background-color: #dc3545; color: white; }
-        .tag-neutral { background-color: #6c757d; color: white; }
-
-        /* Emotion Tag Colors */
-        .tag-joy, .tag-excitement, .tag-love, .tag-gratitude { background-color: #ffc107; color: #212529; }
-        .tag-sadness, .tag-disappointment, .tag-grief { background-color: #007bff; color: white; }
-        .tag-nervousness, .tag-fear { background-color: #6f42c1; color: white; }
-        .tag-anger { background-color: #c82333; color: white; }
-        .tag-surprise { background-color: #17a2b8; color: white; }
-        .tag-disgust { background-color: #5a6268; color: white; }
-
-        /* Fade-out animation for deleted entries */
-        .entry-card.deleting {
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-            opacity: 0;
-            transform: scale(0.95);
-        }
-    </style>
+    
 </head>
 <body>
 <nav>
@@ -34,12 +14,18 @@
         <span class="logo">🧠 MindNest</span>
         <div class="nav-links">
             <a href="/">Home</a>
+            <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('contact') }}">Contact</a>
             <a href="/dashboard">Dashboard</a>
+            
              <a href="{{ url_for('export_csv') }}" class="btn export-btn">Export as CSV</a>
-            {% if session.get('logged_in') %}
-                <a href="{{ url_for('logout') }}" class="nav-auth">Logout</a>
+             {% if session.get('logged_in') %}
                 {% if session.get('user_picture') %}
-                    <img src="{{ session.get('user_picture') }}" alt="{{ session.get('user_name') }}" class="nav-avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-left:12px;border:2px solid rgba(255,255,255,0.6);" />
+                    <a href="{{ url_for('profile') }}">
+                        <img src="{{ session.get('user_picture') }}" 
+                             alt="{{ session.get('user_name') }}" 
+                             class="nav-avatar" />
+                    </a>
                 {% endif %}
             {% else %}
                 <a href="{{ url_for('login') }}" class="nav-auth">Login</a>

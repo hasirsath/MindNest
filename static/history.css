@@ -7,14 +7,14 @@
 
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(to bottom right, #e3f2fd, #fff);
+    background: #fdfaf5; /* soft cream */
     padding-top: 100px;
-    color: #333;
+    color: #4b3b2f; /* warm brown */
 }
 
 /* Navbar */
 nav {
-    background: #fff3cd;
+    background: #e9dcc5; /* warm beige */
     padding: 16px 48px;
     position: fixed;
     top: 0; 
@@ -27,24 +27,22 @@ nav {
 .nav-container {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* logo left, everything else right */
+    justify-content: space-between;
 }
 
-/* Push all links to the right */
 .nav-links {
     display: flex;
     align-items: center;
     gap: 20px;
-    margin-left: auto; /* this moves the group to the right */
+    margin-left: auto;
 }
 
-/* Logo section */
 .logo {
     display: flex;
     align-items: center;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #222;
+    color: #5a4635; /* deep brown */
 }
 
 .logo img {
@@ -53,17 +51,16 @@ nav {
     width: 28px;
 }
 
-
 .nav-links a {
     text-decoration: none;
-    color: #222;
+    color: #4b3b2f;
     font-weight: 500;
     font-size: 1rem;
     transition: color 0.2s;
 }
 
 .nav-links a:hover {
-    color: #000;
+    color: #2e241c;
 }
 
 /* Avatar */
@@ -76,7 +73,6 @@ nav {
     cursor: pointer;
 }
 
-
 /* Page Container */
 .history-container {
     max-width: 680px;
@@ -88,15 +84,16 @@ nav {
     font-size: 2.2rem;
     margin-bottom: 24px;
     text-align: center;
+    color: #4b3b2f;
 }
 
 /* Entry Cards */
 .entry-card {
-    background: #fff;
+    background: #fffdf9; /* off white */
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 24px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease;
 }
 
@@ -106,14 +103,14 @@ nav {
 
 .timestamp {
     font-size: 0.95rem;
-    color: #666;
+    color: #7a6a58;
     margin-bottom: 12px;
 }
 
 .text {
     font-size: 1.1rem;
     margin-bottom: 16px;
-    color: #222;
+    color: #3a2f24;
     line-height: 1.5;
 }
 
@@ -133,20 +130,23 @@ nav {
     font-weight: 500;
 }
 
-.mood-tag {
-    background: #dbeafe;
-    color: #111;
-}
+/* Mood tags */
+.tag-positive { background: #e6f4ea; color: #2d6a4f; }
+.tag-negative { background: #fce8e6; color: #b02a37; }
+.tag-neutral { background: #e6e6e6; color: #555; }
 
-.emotion-tag {
-    background: #fef3c7;
-    color: #111;
-}
+/* Emotion tags (warm earthy tones) */
+.tag-joy, .tag-excitement, .tag-love, .tag-gratitude { background-color: #fde68a; color: #3a2f24; }
+.tag-sadness, .tag-disappointment, .tag-grief { background-color: #c7d2fe; color: #1e3a8a; }
+.tag-nervousness, .tag-fear { background-color: #ddd6fe; color: #4c1d95; }
+.tag-anger { background-color: #fecaca; color: #991b1b; }
+.tag-surprise { background-color: #bae6fd; color: #075985; }
+.tag-disgust { background-color: #d1d5db; color: #1f2937; }
 
 /* Suggestion */
 .suggestion {
     font-style: italic;
-    color: #555;
+    color: #6b5c4b;
     margin-bottom: 16px;
 }
 
@@ -168,23 +168,23 @@ nav {
 
 .btn.edit {
     background: #fff;
-    border: 2px solid #007bff;
-    color: #007bff;
+    border: 2px solid #8b5e34;
+    color: #8b5e34;
 }
 
 .btn.edit:hover {
-    background: #007bff;
+    background: #8b5e34;
     color: #fff;
 }
 
 .btn.delete {
     background: #fff;
-    border: 2px solid #dc3545;
-    color: #dc3545;
+    border: 2px solid #b02a37;
+    color: #b02a37;
 }
 
 .btn.delete:hover {
-    background: #dc3545;
+    background: #b02a37;
     color: #fff;
 }
 
@@ -201,22 +201,23 @@ nav {
     }
 }
 
-.logo {
-    font-weight: bold;
-    font-size: 1.4rem;
-    color: #333;
+@media print {
+    body {
+        background-color: white;
+    }
+    nav, .footer, .actions, .history-header {
+        display: none !important;
+    }
+    .entry-card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
 }
 
-@media print {
-        body {
-            background-color: white;
-        }
-        nav, .footer, .actions, .history-header {
-            display: none !important;
-        }
-        .entry-card {
-            box-shadow: none;
-            border: 1px solid #ccc;
-            page-break-inside: avoid;
-        }
-    }
+/* Deleted entry fade-out */
+.entry-card.deleting {
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    opacity: 0;
+    transform: scale(0.95);
+}

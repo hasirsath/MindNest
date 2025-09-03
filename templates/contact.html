@@ -25,8 +25,10 @@
             <span class="logo">🧠 MindNest</span>
             <div class="nav-links">
                 <a href="/">Home</a>
+                <a href="{{ url_for('about') }}">About</a>
                 <a href="/dashboard">Dashboard</a>
                 <a href="/history">History</a>
+                
             {% if session.get('logged_in') %}
                 {% if session.get('user_picture') %}
                     <a href="/profile"><img src="{{ session.get('user_picture') }}" alt="{{ session.get('user_name') }}" class="nav-avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-left:12px;border:2px solid rgba(255,255,255,0.6);" /></a>

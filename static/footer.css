@@ -1,14 +1,40 @@
-/* MindNest Footer - Project Blue Theme */
+/* MindNest Footer - Warm Neutral Theme */
 .footer {
-    background: linear-gradient(90deg, #36a2eb 60%, #1976d2 100%);
-    color: #fff;
+    background: #e9dcc5; /* warm beige */
+    color: #4b3b2f;      /* warm brown text */
     text-align: center;
     padding: 22px 0 16px 0;
-    margin-top: 48px;
-    font-size: 1.08em;
-    box-shadow: 0 -2px 8px rgba(54,162,235,0.08);
+    margin-top: 50px ;
+    font-size: 1em;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
     width: 100%;
 }
+
+/* Sticky footer setup */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Content wrapper */
+main {
+    flex: 1;
+}
+
+/* Footer styling */
+.footer {
+    background: #e9dcc5; /* warm beige */
+    color: #4b3b2f;      /* warm brown text */
+    text-align: center;
+    padding: 12px 0;     /* thinner footer */
+    font-size: 0.9em;    /* slightly smaller text */
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
+    width: 100%;
+    margin-top: auto;    /* stick to bottom */
+}
+
 .footer .footer-content {
     max-width: 950px;
     margin: 0 auto;
@@ -16,116 +42,61 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
 }
-.footer .footer-left {
-    text-align: left;
-    flex: 1 1 200px;
-    min-width: 180px;
-    font-weight: 600;
-    letter-spacing: 1px;
-}
-.footer .footer-center {
-    flex: 1 1 200px;
-    min-width: 180px;
-    color: #e3f2fd;
-    font-size: 0.97em;
-}
+
+
+/* Right */
 .footer .footer-right {
     text-align: right;
     flex: 1 1 200px;
     min-width: 180px;
 }
+
+/* Links */
 .footer a {
-    color: #ffd600;
+    color: #8d6e63; /* medium warm brown */
     text-decoration: none;
     margin: 0 8px;
-    font-size: 0.97em;
+    font-size: 0.95em;
     transition: color 0.2s;
 }
+
 .footer a:hover {
     text-decoration: underline;
-    color: #fffde7;
+    color: #4b3b2f; /* darker brown */
 }
+
+/* Footer logo/accent */
 .footer-logo {
-    color: #ffd600;
-    font-size: 1.2em;
+    color: #5a4635; /* deep brown */
+    font-size: 1.1em;
     font-weight: bold;
     letter-spacing: 1px;
 }
+
+/* Icons (if any) */
 .footer img {
-    filter: brightness(0) saturate(100%) invert(81%) sepia(98%) saturate(749%) hue-rotate(1deg) brightness(104%) contrast(104%);
-    margin-left: 6px;
-    margin-right: 2px;
+    filter: brightness(0) saturate(100%) invert(29%) sepia(11%) 
+            saturate(718%) hue-rotate(347deg) brightness(94%) contrast(89%);
+    margin: 0 6px;
     transition: filter 0.2s;
 }
 .footer img:hover {
-    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(120%) contrast(120%);
+    filter: brightness(0) saturate(100%) invert(15%) sepia(9%) 
+            saturate(711%) hue-rotate(347deg) brightness(90%) contrast(92%);
 }
+
+/* Responsive */
 @media (max-width: 700px) {
     .footer .footer-content {
         flex-direction: column;
         text-align: center;
         gap: 8px;
     }
-    .footer .footer-left, .footer .footer-center, .footer .footer-right {
-        text-align: center;
-    }
-}
-.footer {
-    background: linear-gradient(90deg, #36a2eb 60%, #1976d2 100%);
-    color: #fff;
-    text-align: center;
-    padding: 22px 0 16px 0;
-    margin-top: 48px;
-    font-size: 1.08em;
-    box-shadow: 0 -2px 8px rgba(54,162,235,0.08);
-    width: 100%;
-}
-.footer .footer-content {
-    max-width: 950px;
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-}
-.footer .footer-left {
-    text-align: left;
-    flex: 1 1 200px;
-    min-width: 180px;
-    font-weight: 600;
-    letter-spacing: 1px;
-}
-.footer .footer-center {
-    flex: 1 1 200px;
-    min-width: 180px;
-    color: #e3f2fd;
-    font-size: 0.97em;
-}
-.footer .footer-right {
-    text-align: right;
-    flex: 1 1 200px;
-    min-width: 180px;
-}
-.footer a {
-    color: #ffd600;
-    text-decoration: none;
-    margin: 0 8px;
-    font-size: 0.97em;
-}
-.footer a:hover {
-    text-decoration: underline;
-    color: #fffde7;
-}
-@media (max-width: 700px) {
-    .footer .footer-content {
-        flex-direction: column;
-        text-align: center;
-        gap: 8px;
-    }
-    .footer .footer-left, .footer .footer-center, .footer .footer-right {
+    .footer .footer-left,
+    .footer .footer-center,
+    .footer .footer-right {
         text-align: center;
     }
 }
